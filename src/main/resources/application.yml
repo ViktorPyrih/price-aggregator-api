@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: price-aggregator-api
+  profiles:
+    include: marketplaceConfig
