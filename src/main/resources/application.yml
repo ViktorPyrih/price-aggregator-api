@@ -3,3 +3,7 @@ spring:
     name: price-aggregator-api
   profiles:
     include: marketplaceConfig
+  data:
+    redis:
+      port: 6379
+      host: localhost
