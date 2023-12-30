@@ -1,0 +1,14 @@
+price-aggregator-api:
+  marketplace-config:
+    ekatalog:
+      url: https://ek.ua/ua/
+      categories:
+        selector: SELECT li.mainmenu-item | IGNORE 14
+      subcategories-1:
+        actions:
+          - SELECT li.mainmenu-item | FILTER $category | HOVER | SELECT a.mainmenu-subitem:last-child | CLICK
+        selector: SELECT span.sub-katalogs-title
+      subcategories-2:
+        actions:
+          - SELECT li.mainmenu-item | FILTER text=$category | HOVER | SELECT a.mainmenu-subitem:last-child | CLICK
+        selector: SELECT span.sub-katalogs-title | FILTER selector=a.sub-katalogs-link>span,text=$category | SELECT div.sub-katalogs-childs > a
