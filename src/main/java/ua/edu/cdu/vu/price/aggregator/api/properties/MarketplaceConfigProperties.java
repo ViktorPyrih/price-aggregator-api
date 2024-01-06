@@ -23,15 +23,15 @@ public class MarketplaceConfigProperties {
         @NotBlank
         String url;
         @Valid
-        CategoriesConfig categories;
+        SelectorConfig categories;
         @Valid
-        CategoriesConfig subcategories1;
+        SelectorConfig subcategories1;
         @Valid
-        CategoriesConfig subcategories2;
+        SelectorConfig subcategories2;
     }
 
     @Value
-    public static class CategoriesConfig {
+    public static class SelectorConfig {
         List<String> actions;
         @NotBlank
         String selector;

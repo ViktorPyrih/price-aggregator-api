@@ -3,12 +3,14 @@ price-aggregator-api:
     ekatalog:
       url: https://ek.ua/ua/
       categories:
-        selector: SELECT li.mainmenu-item | IGNORE 14
+        selector: SELECT a.mainmenu-link | IGNORE 7,14 | TEXT
       subcategories-1:
         actions:
-          - SELECT li.mainmenu-item | FILTER $category | HOVER | SELECT a.mainmenu-subitem:last-child | CLICK
-        selector: SELECT span.sub-katalogs-title
+          - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
+          - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
+        selector: SELECT span.sub-katalogs-title | TEXT
       subcategories-2:
         actions:
-          - SELECT li.mainmenu-item | FILTER text=$category | HOVER | SELECT a.mainmenu-subitem:last-child | CLICK
-        selector: SELECT span.sub-katalogs-title | FILTER selector=a.sub-katalogs-link>span,text=$category | SELECT div.sub-katalogs-childs > a
+          - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
+          - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
+        selector: SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory']) | SELECT div.sub-katalogs-childs>a | TEXT
