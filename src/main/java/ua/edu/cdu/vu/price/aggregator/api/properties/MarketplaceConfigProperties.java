@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Value
 @Validated
@@ -16,24 +17,20 @@ import java.util.Map;
 public class MarketplaceConfigProperties {
 
     @NotEmpty
-    Map<String, @Valid Part> marketplaceConfig;
+    Map<@NotBlank String, @Valid Part> marketplaceConfig;
 
-    @Value
-    public static class Part {
-        @NotBlank
-        String url;
-        @Valid
-        SelectorConfig categories;
-        @Valid
-        SelectorConfig subcategories1;
-        @Valid
-        SelectorConfig subcategories2;
+    public Part get(String marketplace) {
+        return Optional.ofNullable(marketplaceConfig.get(marketplace))
+                .orElseThrow(() -> new UnsupportedOperationException("Marketplace '%s' is not supported".formatted(marketplace)));
     }
 
-    @Value
-    public static class SelectorConfig {
-        List<String> actions;
-        @NotBlank
-        String selector;
+    public record Part(@NotBlank String url,
+                       @Valid MarketplaceConfigProperties.SelectorConfig categories,
+                       @Valid MarketplaceConfigProperties.SelectorConfig subcategories1,
+                       @Valid MarketplaceConfigProperties.SelectorConfig subcategories2) {
+    }
+
+    public record SelectorConfig(List<String> actions,
+                                 @NotBlank String selector) {
     }
 }
