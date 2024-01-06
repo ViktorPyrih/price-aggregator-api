@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslEvaluationScenario;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
@@ -18,6 +19,7 @@ public class DslEvaluationService {
 
     private final DslExpressionParser dslExpressionParser;
 
+    @Cacheable("dsl-evaluation-cache")
     public DslEvaluationResponse evaluate(DslEvaluationRequest request) {
         String url = request.target().url();
         List<DslExpression<Void>> actions = Stream.ofNullable(request.actions())

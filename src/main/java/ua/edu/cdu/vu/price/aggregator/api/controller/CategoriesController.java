@@ -21,4 +21,18 @@ public class CategoriesController {
                 .categories(categoriesService.getCategories(marketplace))
                 .build();
     }
+
+    @GetMapping("{category}/categories")
+    public CategoriesResponse getCategories(@PathVariable String marketplace, @PathVariable String category) {
+        return CategoriesResponse.builder()
+                .categories(categoriesService.getCategories(marketplace, category))
+                .build();
+    }
+
+    @GetMapping("{category}/categories/{subcategory}/categories")
+    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @PathVariable String category, @PathVariable String subcategory) {
+        return CategoriesResponse.builder()
+                .categories(categoriesService.getCategories(marketplace, category, subcategory))
+                .build();
+    }
 }
