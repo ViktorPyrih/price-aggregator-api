@@ -13,4 +13,4 @@ price-aggregator-api:
         actions:
           - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
           - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
-        selector: SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory']) | SELECT div.sub-katalogs-childs>a | TEXT
+        selector: SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory']) | FIRST | SELECT div.sub-katalogs-childs>a | TEXT

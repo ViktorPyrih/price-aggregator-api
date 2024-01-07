@@ -20,20 +20,20 @@ public class DslEvaluationService {
     private final DslExpressionParser dslExpressionParser;
 
     @Cacheable("dsl-evaluation-cache")
-    public DslEvaluationResponse evaluate(DslEvaluationRequest request) {
+    public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
         String url = request.target().url();
         List<DslExpression<Void>> actions = Stream.ofNullable(request.actions())
                 .flatMap(Collection::stream)
                 .map(dslExpressionParser::<Void>parse)
                 .toList();
-        DslExpression<List<String>> expression = dslExpressionParser.parse(request.expression());
+        DslExpression<T> expression = dslExpressionParser.parse(request.expression());
 
-        try (var scenario = DslEvaluationScenario.<List<String>>builder()
+        try (var scenario = DslEvaluationScenario.<T>builder()
                 .actions(actions)
                 .expression(expression)
                 .build()) {
-            return DslEvaluationResponse.builder()
-                    .values(scenario.run(url, request.arguments()))
+            return DslEvaluationResponse.<T>builder()
+                    .value(scenario.run(url, request.arguments()))
                     .build();
         }
     }

@@ -3,3 +3,4 @@ spring:
     name: price-aggregator-api
   profiles:
     include: marketplaceConfig
+selenide.headless: true

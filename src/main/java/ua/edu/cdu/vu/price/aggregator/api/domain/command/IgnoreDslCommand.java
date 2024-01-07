@@ -21,7 +21,7 @@ public class IgnoreDslCommand extends DslCommand<ElementsCollection, ElementsCol
     @Override
     public ElementsCollection execute(String url, ElementsCollection input, Map<String, String> context) {
         if (isNull(input)) {
-            throw new DslExecutionException("Filter command executed on null input");
+            throw new DslExecutionException("IGNORE command executed on null input");
         }
 
         List<WebElement> remainingElements = new LinkedList<>();

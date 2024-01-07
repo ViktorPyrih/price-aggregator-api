@@ -3,12 +3,10 @@ package ua.edu.cdu.vu.price.aggregator.api.dto;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
-
 @Value
 @Builder
-public class DslEvaluationResponse {
+public class DslEvaluationResponse<T> {
 
-    List<String> values;
+    T value;
 
 }

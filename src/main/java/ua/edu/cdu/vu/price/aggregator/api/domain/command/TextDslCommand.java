@@ -13,7 +13,7 @@ public class TextDslCommand extends DslCommand<ElementsCollection, List<String>>
     @Override
     public List<String> execute(String url, ElementsCollection input, Map<String, String> context) {
         if (isNull(input)) {
-            throw new DslExecutionException("Filter command executed on null input");
+            throw new DslExecutionException("TEXT command executed on null input");
         }
         return input.texts();
     }

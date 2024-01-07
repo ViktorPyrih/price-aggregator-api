@@ -38,6 +38,6 @@ public class CategoriesService {
     private List<String> getCategories(String marketplace, Function<MarketplaceConfig, SelectorConfig> selectorConfigFunction, Map<String, String> arguments) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfigFunction.apply(marketplaceConfig), arguments);
-        return dslEvaluationService.evaluate(request).getValues();
+        return dslEvaluationService.<List<String>>evaluate(request).getValue();
     }
 }

@@ -13,7 +13,7 @@ public class FirstDslCommand extends DslCommand<ElementsCollection, SelenideElem
     @Override
     public SelenideElement execute(String url, ElementsCollection input, Map<String, String> context) {
         if (isNull(input)) {
-            throw new DslExecutionException("Filter command executed on null input");
+            throw new DslExecutionException("FIRST command executed on null input");
         }
 
         if (input.isEmpty()) {

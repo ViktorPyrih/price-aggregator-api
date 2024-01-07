@@ -12,9 +12,10 @@ public class ClickDslCommand extends DslCommand<SelenideElement, Void> {
     @Override
     public Void execute(String url, SelenideElement input, Map<String, String> context) {
         if (isNull(input)) {
-            throw new DslExecutionException("Filter command executed on null input");
+            throw new DslExecutionException("CLICK command executed on null input");
         }
         input.click();
+        resizeWindow();
         return null;
     }
 }

@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import org.openqa.selenium.Dimension;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
@@ -8,11 +9,13 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import java.util.Arrays;
 import java.util.Map;
 
+import static com.codeborne.selenide.WebDriverRunner.driver;
+
 public abstract class DslCommand<IN, OUT> {
 
     public enum Option {
 
-        CLICK, FILTER, FIRST, HOVER, IGNORE, SELECT, TEXT;
+        BY_ID, CLICK, FILTER, FIRST, HOVER, IGNORE, SELECT, TEXT, SCREENSHOT;
 
         public static Option parseOption(String name) {
             return Arrays.stream(values())
@@ -29,5 +32,9 @@ public abstract class DslCommand<IN, OUT> {
 
     String parse(String expression, Map<String, String> context) {
         return PARSER.parseExpression(expression, PARSER_CONTEXT).getValue(context, String.class);
+    }
+
+    void resizeWindow() {
+        driver().getWebDriver().manage().window().setSize(new Dimension(2048, 2048));
     }
 }

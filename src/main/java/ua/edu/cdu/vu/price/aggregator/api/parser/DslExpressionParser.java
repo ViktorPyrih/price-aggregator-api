@@ -33,19 +33,21 @@ public class DslExpressionParser {
         String command = args[0];
         var option = DslCommand.Option.parseOption(command);
         return switch (option) {
+            case BY_ID -> createByIdCommand(args);
             case CLICK -> new ClickDslCommand();
             case FILTER -> createFilterCommand(args);
             case FIRST -> new FirstDslCommand();
             case HOVER -> new HoverDslCommand();
             case IGNORE -> createIgnoreCommand(args);
+            case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();
         };
     }
 
     private FilterDslCommand createFilterCommand(String[] args) {
-        if (args.length < 2) {
-            throw new DslValidationException("Filter command accepts at least one argument");
+        if (args.length != 2) {
+            throw new DslValidationException("FILTER command accepts exactly one argument");
         }
         var argumentsMap = parseArgumentsAsMap(args[1]);
 
@@ -53,8 +55,8 @@ public class DslExpressionParser {
     }
 
     private IgnoreDslCommand createIgnoreCommand(String[] args) {
-        if (args.length > 2) {
-            throw new DslValidationException("Ignore command accepts at least one argument");
+        if (args.length != 2) {
+            throw new DslValidationException("IGNORE command accepts exactly one argument");
         }
 
         try {
@@ -65,11 +67,19 @@ public class DslExpressionParser {
     }
 
     private SelectDslCommand createSelectCommand(String[] args) {
-        if (args.length > 2) {
-            throw new DslValidationException("Select command accepts at least one argument");
+        if (args.length != 2) {
+            throw new DslValidationException("SELECT command accepts exactly one argument");
         }
 
         return new SelectDslCommand(args[1]);
+    }
+
+    private ByIdDslCommand createByIdCommand(String[] args) {
+        if (args.length != 2) {
+            throw new DslValidationException("BY_ID command accepts exactly one argument");
+        }
+
+        return new ByIdDslCommand(args[1]);
     }
 
     private Set<Integer> parseArgumentsAsSet(String arguments) {
