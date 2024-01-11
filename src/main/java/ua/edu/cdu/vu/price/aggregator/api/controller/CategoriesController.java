@@ -17,22 +17,16 @@ public class CategoriesController {
 
     @GetMapping
     public CategoriesResponse getCategories(@PathVariable String marketplace) {
-        return CategoriesResponse.builder()
-                .categories(categoriesService.getCategories(marketplace))
-                .build();
+        return categoriesService.getCategories(marketplace);
     }
 
     @GetMapping("{category}/categories")
     public CategoriesResponse getCategories(@PathVariable String marketplace, @PathVariable String category) {
-        return CategoriesResponse.builder()
-                .categories(categoriesService.getCategories(marketplace, category))
-                .build();
+        return categoriesService.getCategories(marketplace, category);
     }
 
     @GetMapping("{category}/categories/{subcategory}/categories")
     public CategoriesResponse getSubcategories(@PathVariable String marketplace, @PathVariable String category, @PathVariable String subcategory) {
-        return CategoriesResponse.builder()
-                .categories(categoriesService.getCategories(marketplace, category, subcategory))
-                .build();
+        return categoriesService.getCategories(marketplace, category, subcategory);
     }
 }

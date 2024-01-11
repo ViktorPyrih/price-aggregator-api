@@ -23,7 +23,8 @@ public class MarketplaceConfigProperties {
     public record Part(@NotBlank String url,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig categories,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories1,
-                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories2) {
+                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories2,
+                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig filters) {
     }
 
     public record SelectorConfig(List<@NotBlank String> actions,
