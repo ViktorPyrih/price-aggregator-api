@@ -26,7 +26,7 @@ public class DslEvaluationService {
                 .flatMap(Collection::stream)
                 .map(dslExpressionParser::<Void>parse)
                 .toList();
-        DslExpression<T> expression = dslExpressionParser.parse(request.expression());
+        DslExpression<T> expression = dslExpressionParser.parse(request.expression(), request.otherExpressions());
 
         try (var scenario = DslEvaluationScenario.<T>builder()
                 .actions(actions)

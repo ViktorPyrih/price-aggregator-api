@@ -24,7 +24,7 @@ public class DslEvaluationController {
     private final DslEvaluationService dslEvaluationService;
 
     @RequestMapping(method = {GET, POST})
-    public DslEvaluationResponse<List<String>> evaluate(@RequestBody @Valid DslEvaluationRequest request) {
+    public DslEvaluationResponse<Object> evaluate(@RequestBody @Valid DslEvaluationRequest request) {
         return dslEvaluationService.evaluate(request);
     }
 

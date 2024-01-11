@@ -5,6 +5,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -15,7 +16,7 @@ public abstract class DslCommand<IN, OUT> {
 
     public enum Option {
 
-        BY_ID, CLICK, FILTER, FIRST, HOVER, IGNORE, SELECT, TEXT, SCREENSHOT;
+        BY_ID, CLICK, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, SELECT, TEXT, SCREENSHOT, ZIP;
 
         public static Option parseOption(String name) {
             return Arrays.stream(values())
@@ -32,6 +33,14 @@ public abstract class DslCommand<IN, OUT> {
 
     String parse(String expression, Map<String, String> context) {
         return PARSER.parseExpression(expression, PARSER_CONTEXT).getValue(context, String.class);
+    }
+
+    int parseInt(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new DslValidationException("%s cannot be converted to integer".formatted(value));
+        }
     }
 
     void resizeWindow() {

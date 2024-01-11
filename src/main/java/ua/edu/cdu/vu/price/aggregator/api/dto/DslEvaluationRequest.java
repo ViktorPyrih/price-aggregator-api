@@ -11,6 +11,7 @@ import java.util.Map;
 public record DslEvaluationRequest(@Valid @NotNull Target target,
                                    @NotBlank String expression,
                                    List<@NotBlank String> actions,
+                                   List<@NotBlank String> otherExpressions,
                                    Map<@NotBlank String, @NotBlank String> arguments) {
 
     public record Target(@URL @NotBlank String url) {

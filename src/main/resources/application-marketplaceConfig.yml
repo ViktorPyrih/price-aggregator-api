@@ -14,3 +14,11 @@ price-aggregator-api:
           - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
           - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
         selector: SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory']) | FIRST | SELECT div.sub-katalogs-childs>a | TEXT
+      filters:
+        actions:
+          - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
+          - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
+          - SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory1']) | FIRST | SELECT div.sub-katalogs-childs>a | FILTER text=$(['subcategory2']) | FIRST | CLICK
+        selector: SELECT div.h2.h2-open | TEXT | ZIP with=1
+        other:
+          - SELECT ul.list>li.match-li-href | GROUP_BY parent_id | TEXT

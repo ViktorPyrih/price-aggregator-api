@@ -15,6 +15,7 @@ public interface DslEvaluationRequestMapper {
     @Mapping(target = "target.url", source = "url")
     @Mapping(target = "expression", source = "selectorConfig.selector")
     @Mapping(target = "actions", source = "selectorConfig.actions")
+    @Mapping(target = "otherExpressions", source = "selectorConfig.other")
     @Mapping(target = "arguments", source = "arguments")
     DslEvaluationRequest convertToRequest(String url, SelectorConfig selectorConfig, Map<String, String> arguments);
 

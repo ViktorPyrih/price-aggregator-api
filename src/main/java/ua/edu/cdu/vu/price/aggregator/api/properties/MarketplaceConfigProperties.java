@@ -26,8 +26,9 @@ public class MarketplaceConfigProperties {
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories2) {
     }
 
-    public record SelectorConfig(List<String> actions,
-                                 @NotBlank String selector) {
+    public record SelectorConfig(List<@NotBlank String> actions,
+                                 @NotBlank String selector,
+                                 List<@NotBlank String> other) {
     }
 
     public Part get(String marketplace) {
