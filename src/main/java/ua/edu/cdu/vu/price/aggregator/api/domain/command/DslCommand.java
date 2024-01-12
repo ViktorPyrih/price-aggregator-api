@@ -31,11 +31,11 @@ public abstract class DslCommand<IN, OUT> {
 
     public abstract OUT execute(String url, IN input, Map<String, String> context);
 
-    String parse(String expression, Map<String, String> context) {
+    protected String parse(String expression, Map<String, String> context) {
         return PARSER.parseExpression(expression, PARSER_CONTEXT).getValue(context, String.class);
     }
 
-    int parseInt(String value) {
+    protected int parseInt(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -43,7 +43,7 @@ public abstract class DslCommand<IN, OUT> {
         }
     }
 
-    void resizeWindow() {
+    protected void resizeWindow() {
         driver().getWebDriver().manage().window().setSize(new Dimension(2048, 2048));
     }
 }
