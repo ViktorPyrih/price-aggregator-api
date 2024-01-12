@@ -48,6 +48,7 @@ public class DslExpressionParser {
             case GROUP_BY -> createGroupByCommand(args);
             case HOVER -> new HoverDslCommand();
             case IGNORE -> createIgnoreCommand(args);
+            case INPUT -> createInputCommand(args);
             case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();
@@ -106,6 +107,14 @@ public class DslExpressionParser {
         }
 
         return new ZipDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
+    }
+
+    private InputDslCommand createInputCommand(String[] args) {
+        if (args.length != 2) {
+            throw new DslValidationException("BY_ID command accepts exactly one argument");
+        }
+
+        return new InputDslCommand(parseArgumentsAsMap(args[1]));
     }
 
     private Set<Integer> parseArgumentsAsSet(String arguments) {

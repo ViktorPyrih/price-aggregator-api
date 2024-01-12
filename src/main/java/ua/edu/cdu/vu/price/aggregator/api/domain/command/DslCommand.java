@@ -16,7 +16,7 @@ public abstract class DslCommand<IN, OUT> {
 
     public enum Option {
 
-        BY_ID, CLICK, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, SELECT, TEXT, SCREENSHOT, ZIP;
+        BY_ID, CLICK, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, INPUT, SELECT, TEXT, SCREENSHOT, ZIP;
 
         public static Option parseOption(String name) {
             return Arrays.stream(values())
