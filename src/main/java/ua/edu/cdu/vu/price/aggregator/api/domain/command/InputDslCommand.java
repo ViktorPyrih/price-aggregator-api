@@ -16,6 +16,7 @@ public class InputDslCommand extends DslCommand<SelenideElement, Void> {
 
     @Override
     public Void execute(String url, SelenideElement input, Map<String, String> context) {
+
         String resolvedValue = parse(value, context);
         input.sendKeys(resolvedValue);
         return null;

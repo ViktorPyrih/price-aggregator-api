@@ -41,6 +41,7 @@ public class DslExpressionParser {
         String command = args[0];
         var option = DslCommand.Option.parseOption(command);
         return switch (option) {
+            case BASE64 -> new Base64DslCommand();
             case BY_ID -> createByIdCommand(args);
             case CLICK -> new ClickDslCommand();
             case FILTER -> createFilterCommand(args);

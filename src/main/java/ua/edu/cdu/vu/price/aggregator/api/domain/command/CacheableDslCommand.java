@@ -20,7 +20,7 @@ public abstract class CacheableDslCommand extends DslCommand<SelenideElement, St
     @Override
     public String execute(String url, SelenideElement input, Map<String, String> context) {
         if (isNull(input)) {
-            throw new DslExecutionException("CLICK command executed on null input");
+            throw new DslExecutionException("%s command executed on null input".formatted(getClass().getSimpleName()));
         }
 
         CacheEntry cacheEntry = new CacheEntry(url, input.toString());
