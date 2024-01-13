@@ -51,10 +51,10 @@ public class DslExpressionParser {
             case HOVER -> new HoverDslCommand();
             case IGNORE -> createIgnoreCommand(args);
             case INPUT -> createInputCommand(args);
+            case JOIN -> createJoinCommand(args, otherDslExpressions);
             case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();
-            case ZIP -> createZipCommand(args, otherDslExpressions);
         };
     }
 
@@ -103,12 +103,12 @@ public class DslExpressionParser {
         return new GroupByDslCommand(args[1]);
     }
 
-    private ZipDslCommand createZipCommand(String[] args, List<DslExpression<Iterable<Object>>> otherDslExpressions) {
+    private JoinDslCommand createJoinCommand(String[] args, List<DslExpression<Iterable<Object>>> otherDslExpressions) {
         if (args.length != 2) {
             throw new DslValidationException("ZIP command accepts exactly one argument");
         }
 
-        return new ZipDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
+        return new JoinDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
     }
 
     private InputDslCommand createInputCommand(String[] args) {

@@ -33,6 +33,6 @@ price-aggregator-api:
             - BY_ID minPrice_ | INPUT value=$(['minPrice'])
             - BY_ID maxPrice_ | INPUT value=$(['maxPrice'])
             - BY_ID match_submit | CLICK
-          selector: SELECT div.model-short-div | SCREENSHOT | BASE64 | ZIP with=1
+          selector: SELECT div.model-short-div | SCREENSHOT | BASE64 | JOIN with=1
           other:
             - SELECT a.model-short-title | ATTRIBUTE href

@@ -13,11 +13,11 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
-public class ZipDslCommand extends DslCommand<Iterable<Object>, List<Pair<Object, Object>>> {
+public class JoinDslCommand extends DslCommand<Iterable<Object>, List<Pair<Object, Object>>> {
 
     private final DslExpression<Iterable<Object>> withExpression;
 
-    public ZipDslCommand(@NonNull List<DslExpression<Iterable<Object>>> otherDslExpressions, @NonNull Map<String, String> arguments) {
+    public JoinDslCommand(@NonNull List<DslExpression<Iterable<Object>>> otherDslExpressions, @NonNull Map<String, String> arguments) {
         if (otherDslExpressions.size() < 1) {
             throw new DslValidationException("ZIP command takes 'otherDslExpression' as a parameter");
         }
