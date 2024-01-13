@@ -21,7 +21,7 @@ public class DslExpression<T> {
         };
     }
 
-    public T evaluate(String url, Map<String, String> context) {
+    public T evaluate(String url, Map<String, Object> context) {
         Object result = null;
         try {
             for (var command : commands) {

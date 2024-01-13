@@ -10,12 +10,12 @@ import ua.edu.cdu.vu.price.aggregator.api.service.FiltersService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/marketplaces/{marketplace}/categories")
+@RequestMapping("/api/v1/marketplaces/{marketplace}/categories/{category}/categories/{subcategory1}/categories/{subcategory2}/filters")
 public class FiltersController {
 
     private final FiltersService filtersService;
 
-    @GetMapping("{category}/categories/{subcategory1}/categories/{subcategory2}/filters")
+    @GetMapping
     public FiltersResponse getFilters(@PathVariable String marketplace, @PathVariable String category, @PathVariable String subcategory1, @PathVariable String subcategory2) {
         return filtersService.getFilters(marketplace, category, subcategory1, subcategory2);
     }

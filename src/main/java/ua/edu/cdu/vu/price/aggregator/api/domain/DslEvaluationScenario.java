@@ -17,7 +17,7 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
     List<DslExpression<Void>> actions;
     @NonNull DslExpression<T> expression;
 
-    public T run(String url, Map<String, String> context) {
+    public T run(String url, Map<String, Object> context) {
         Stream.ofNullable(actions)
                 .flatMap(List::stream)
                 .forEach(action -> action.evaluate(url, context));

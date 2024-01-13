@@ -11,7 +11,7 @@ import static java.util.Objects.isNull;
 public class FirstDslCommand extends DslCommand<ElementsCollection, SelenideElement> {
 
     @Override
-    public SelenideElement execute(String url, ElementsCollection input, Map<String, String> context) {
+    public SelenideElement execute(String url, ElementsCollection input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("FIRST command executed on null input");
         }

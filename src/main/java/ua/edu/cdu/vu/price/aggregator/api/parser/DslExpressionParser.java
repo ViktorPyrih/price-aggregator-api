@@ -41,6 +41,7 @@ public class DslExpressionParser {
         String command = args[0];
         var option = DslCommand.Option.parseOption(command);
         return switch (option) {
+            case ATTRIBUTE -> createAttributeCommand(args);
             case BASE64 -> new Base64DslCommand();
             case BY_ID -> createByIdCommand(args);
             case CLICK -> new ClickDslCommand();
@@ -116,6 +117,14 @@ public class DslExpressionParser {
         }
 
         return new InputDslCommand(parseArgumentsAsMap(args[1]));
+    }
+
+    private AttributeDslCommand createAttributeCommand(String[] args) {
+        if (args.length != 2) {
+            throw new DslValidationException("ATTRIBUTE command accepts exactly one argument");
+        }
+
+        return new AttributeDslCommand(args[1]);
     }
 
     private Set<Integer> parseArgumentsAsSet(String arguments) {

@@ -19,7 +19,7 @@ public class IgnoreDslCommand extends DslCommand<ElementsCollection, ElementsCol
     private final Set<Integer> indexes;
 
     @Override
-    public ElementsCollection execute(String url, ElementsCollection input, Map<String, String> context) {
+    public ElementsCollection execute(String url, ElementsCollection input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("IGNORE command executed on null input");
         }

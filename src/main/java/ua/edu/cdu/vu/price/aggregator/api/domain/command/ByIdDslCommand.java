@@ -17,7 +17,7 @@ public class ByIdDslCommand extends DslCommand<SelenideElement, SelenideElement>
     private final String id;
 
     @Override
-    public SelenideElement execute(String url, SelenideElement input, Map<String, String> context) {
+    public SelenideElement execute(String url, SelenideElement input, Map<String, Object> context) {
         if (isNull(input)) {
             return $(By.id(id));
         }

@@ -24,12 +24,20 @@ public class MarketplaceConfigProperties {
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig categories,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories1,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories2,
-                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig filters) {
+                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig filters,
+                       @NotNull @Valid MarketplaceConfigProperties.ProductsSelectorConfig products) {
     }
 
     public record SelectorConfig(List<@NotBlank String> actions,
                                  @NotBlank String selector,
                                  List<@NotBlank String> other) {
+    }
+
+    public record ProductsSelectorConfig(@NotNull @Valid TemplateConfig filters,
+                                         @NotNull @Valid SelectorConfig self) {
+    }
+
+    public record TemplateConfig(@NotBlank String template) {
     }
 
     public Part get(String marketplace) {

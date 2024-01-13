@@ -25,7 +25,7 @@ public class GroupByDslCommand extends DslCommand<ElementsCollection, List<Eleme
     }
 
     @Override
-    public List<ElementsCollection> execute(String url, ElementsCollection input, Map<String, String> context) {
+    public List<ElementsCollection> execute(String url, ElementsCollection input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("GROUP_BY command executed on null input");
         }

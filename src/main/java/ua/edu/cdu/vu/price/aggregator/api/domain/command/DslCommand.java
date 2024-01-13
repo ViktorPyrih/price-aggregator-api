@@ -16,7 +16,7 @@ public abstract class DslCommand<IN, OUT> {
 
     public enum Option {
 
-        BASE64, BY_ID, CLICK, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, INPUT, SELECT, TEXT, SCREENSHOT, ZIP;
+        ATTRIBUTE, BASE64, BY_ID, CLICK, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, INPUT, SELECT, TEXT, SCREENSHOT, ZIP;
 
         public static Option parseOption(String name) {
             return Arrays.stream(values())
@@ -29,9 +29,9 @@ public abstract class DslCommand<IN, OUT> {
     private static final ExpressionParser PARSER = new SpelExpressionParser();
     private static final ParserContext PARSER_CONTEXT = new TemplateParserContext("$(", ")");
 
-    public abstract OUT execute(String url, IN input, Map<String, String> context);
+    public abstract OUT execute(String url, IN input, Map<String, Object> context);
 
-    protected String parse(String expression, Map<String, String> context) {
+    protected String parse(String expression, Map<String, Object> context) {
         return PARSER.parseExpression(expression, PARSER_CONTEXT).getValue(context, String.class);
     }
 

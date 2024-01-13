@@ -17,7 +17,7 @@ public class SelectDslCommand extends DslCommand<SelenideElement, ElementsCollec
     private final String selector;
 
     @Override
-    public ElementsCollection execute(String url, SelenideElement input, Map<String, String> context) {
+    public ElementsCollection execute(String url, SelenideElement input, Map<String, Object> context) {
         if (isNull(input)) {
             return $$(selector);
         }

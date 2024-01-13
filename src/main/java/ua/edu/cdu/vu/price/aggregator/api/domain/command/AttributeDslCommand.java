@@ -2,37 +2,36 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import org.springframework.core.io.FileSystemResource;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
 import java.util.Map;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 
-public class ScreenshotDslCommand extends DslCommand<Object, Object> {
+@RequiredArgsConstructor
+public class AttributeDslCommand extends DslCommand<Object, Object> {
+
+    @NonNull
+    private final String attribute;
 
     @Override
     public Object execute(String url, Object input, Map<String, Object> context) {
         if (isNull(input)) {
-            throw new DslExecutionException("SCREENSHOT command executed on null input");
+            throw new DslExecutionException("Attribute command executed on null input");
         }
 
         if (input instanceof SelenideElement element) {
-            return screenshot(element);
+            return element.getAttribute(attribute);
         }
 
         if (input instanceof ElementsCollection collection) {
             return collection.asFixedIterable().stream()
-                    .map(this::screenshot)
+                    .map(element -> element.getAttribute(attribute))
                     .toList();
         }
 
         return null;
-    }
-
-    private FileSystemResource screenshot(SelenideElement element) {
-        element.scrollIntoView(false);
-        return new FileSystemResource(requireNonNull(element.screenshot()));
     }
 }

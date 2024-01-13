@@ -21,19 +21,19 @@ public class DslEvaluationService {
 
     @Cacheable("dsl-evaluation-cache")
     public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
-        String url = request.target().url();
-        List<DslExpression<Void>> actions = Stream.ofNullable(request.actions())
+        String url = request.getTarget().url();
+        List<DslExpression<Void>> actions = Stream.ofNullable(request.getActions())
                 .flatMap(Collection::stream)
                 .map(dslExpressionParser::<Void>parse)
                 .toList();
-        DslExpression<T> expression = dslExpressionParser.parse(request.expression(), request.otherExpressions());
+        DslExpression<T> expression = dslExpressionParser.parse(request.getExpression(), request.getOtherExpressions());
 
         try (var scenario = DslEvaluationScenario.<T>builder()
                 .actions(actions)
                 .expression(expression)
                 .build()) {
             return DslEvaluationResponse.<T>builder()
-                    .value(scenario.run(url, request.arguments()))
+                    .value(scenario.run(url, request.getArguments()))
                     .build();
         }
     }

@@ -26,7 +26,7 @@ public class FilterDslCommand extends DslCommand<ElementsCollection, ElementsCol
     }
 
     @Override
-    public ElementsCollection execute(String url, ElementsCollection input, Map<String, String> context) {
+    public ElementsCollection execute(String url, ElementsCollection input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("FILTER command executed on null input");
         }

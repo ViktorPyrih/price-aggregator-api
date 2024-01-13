@@ -22,3 +22,17 @@ price-aggregator-api:
         selector: SELECT div.h2.h2-open | TEXT | ZIP with=1
         other:
           - SELECT ul.list>li.match-li-href | GROUP_BY parent_id | TEXT
+      products:
+        filters:
+          template: SELECT .match-li-href | FILTER text=$(['filter_%d']) | FIRST | CLICK
+        self:
+          actions:
+            - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
+            - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
+            - SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory1']) | FIRST | SELECT div.sub-katalogs-childs>a | FILTER text=$(['subcategory2']) | FIRST | CLICK
+            - BY_ID minPrice_ | INPUT value=$(['minPrice'])
+            - BY_ID maxPrice_ | INPUT value=$(['maxPrice'])
+            - BY_ID match_submit | CLICK
+          selector: SELECT div.model-short-div | SCREENSHOT | BASE64 | ZIP with=1
+          other:
+            - SELECT a.model-short-title | ATTRIBUTE href

@@ -12,7 +12,7 @@ import static java.util.Objects.isNull;
 public class Base64DslCommand extends DslCommand<Object, Object> {
 
     @Override
-    public Object execute(String url, Object input, Map<String, String> context) {
+    public Object execute(String url, Object input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("BASE64 command executed on null input");
         }

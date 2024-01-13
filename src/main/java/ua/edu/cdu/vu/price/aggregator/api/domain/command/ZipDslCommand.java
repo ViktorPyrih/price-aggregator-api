@@ -36,7 +36,7 @@ public class ZipDslCommand extends DslCommand<Iterable<Object>, List<Pair<Object
     }
 
     @Override
-    public List<Pair<Object, Object>> execute(String url, Iterable<Object> input, Map<String, String> context) {
+    public List<Pair<Object, Object>> execute(String url, Iterable<Object> input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("ZIP command executed on null input");
         }

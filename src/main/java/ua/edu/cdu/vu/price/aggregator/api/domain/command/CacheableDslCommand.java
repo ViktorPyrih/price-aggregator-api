@@ -18,7 +18,7 @@ public abstract class CacheableDslCommand extends DslCommand<SelenideElement, St
     }
 
     @Override
-    public String execute(String url, SelenideElement input, Map<String, String> context) {
+    public String execute(String url, SelenideElement input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("%s command executed on null input".formatted(getClass().getSimpleName()));
         }

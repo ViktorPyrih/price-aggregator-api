@@ -10,7 +10,7 @@ import static java.util.Objects.isNull;
 public class HoverDslCommand extends DslCommand<SelenideElement, Void> {
 
     @Override
-    public Void execute(String url, SelenideElement input, Map<String, String> context) {
+    public Void execute(String url, SelenideElement input, Map<String, Object> context) {
         if (isNull(input)) {
             throw new DslExecutionException("HOVER command executed on null input");
         }
