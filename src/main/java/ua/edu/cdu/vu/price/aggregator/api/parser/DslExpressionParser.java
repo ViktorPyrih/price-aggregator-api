@@ -26,8 +26,8 @@ public class DslExpressionParser {
 
     public <T> DslExpression<T> parse(@NonNull String selector, @NonNull List<String> otherSelectors) {
         DslExpression<T> dslExpression = new DslExpression<>();
-        List<DslExpression<Iterable<Object>>> otherDslExpressions = otherSelectors.stream()
-                .map(this::<Iterable<Object>>parse)
+        List<DslExpression<Object>> otherDslExpressions = otherSelectors.stream()
+                .map(this::parse)
                 .toList();
         Arrays.stream(selector.split(DSL_COMMAND_SEPARATOR))
                 .map(command -> command.split(DSL_INTER_COMMAND_SEPARATOR))
@@ -37,7 +37,8 @@ public class DslExpressionParser {
         return dslExpression;
     }
 
-    private DslCommand<?, ?> parseCommand(String[] args, List<DslExpression<Iterable<Object>>> otherDslExpressions) {
+    @SuppressWarnings("unchecked,rawtypes")
+    private DslCommand<?, ?> parseCommand(String[] args, List otherDslExpressions) {
         String command = args[0];
         var option = DslCommand.Option.parseOption(command);
         return switch (option) {
@@ -55,6 +56,7 @@ public class DslExpressionParser {
             case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();
+            case UNION -> createUnionCommand(args, otherDslExpressions);
         };
     }
 
@@ -125,6 +127,10 @@ public class DslExpressionParser {
         }
 
         return new AttributeDslCommand(args[1]);
+    }
+
+    private UnionDslCommand createUnionCommand(String[] args, List<DslExpression<List<Object>>> otherDslExpressions) {
+        return new UnionDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
     }
 
     private Set<Integer> parseArgumentsAsSet(String arguments) {

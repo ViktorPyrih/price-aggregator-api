@@ -19,7 +19,7 @@ price-aggregator-api:
           - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
           - SELECT a.mainmenu-subitem:last-child | FIRST | CLICK
           - SELECT div.sub-katalogs-block | FILTER selector=a.sub-katalogs-link>span.sub-katalogs-title,text=$(['subcategory1']) | FIRST | SELECT div.sub-katalogs-childs>a | FILTER text=$(['subcategory2']) | FIRST | CLICK
-        selector: SELECT div.h2.h2-open | TEXT | ZIP with=1
+        selector: SELECT div.h2.h2-open | TEXT | JOIN with=1
         other:
           - SELECT ul.list>li.match-li-href | GROUP_BY parent_id | TEXT
       products:
@@ -33,6 +33,6 @@ price-aggregator-api:
             - BY_ID minPrice_ | INPUT value=$(['minPrice'])
             - BY_ID maxPrice_ | INPUT value=$(['maxPrice'])
             - BY_ID match_submit | CLICK
-          selector: SELECT div.model-short-div | SCREENSHOT | BASE64 | JOIN with=1
+          selector: SELECT a.model-short-title | SCREENSHOT | BASE64 | JOIN with=1
           other:
             - SELECT a.model-short-title | ATTRIBUTE href
