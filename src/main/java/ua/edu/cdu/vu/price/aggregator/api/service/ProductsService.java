@@ -28,13 +28,14 @@ public class ProductsService {
     private static final String SUBCATEGORY_2 = "subcategory2";
     private static final String MIN_PRICE = "minPrice";
     private static final String MAX_PRICE = "maxPrice";
+    private static final String PAGE = "page";
 
     private final MarketplaceConfigDao marketplaceConfigDao;
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
     private final ProductsResponseMapper productsResponseMapper;
 
-    public ProductsResponse getProducts(String marketplace, String category, String subcategory1, String subcategory2, ProductsRequest productsRequest) {
+    public ProductsResponse getProducts(String marketplace, String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
 
         DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), marketplaceConfig.products().self());
@@ -47,6 +48,7 @@ public class ProductsService {
             put(SUBCATEGORY_2, subcategory2);
             put(MIN_PRICE, productsRequest.getMinPrice());
             put(MAX_PRICE, productsRequest.getMaxPrice());
+            put(PAGE, page);
         }};
         var arguments = createArguments(initialArguments, filterValues);
 
