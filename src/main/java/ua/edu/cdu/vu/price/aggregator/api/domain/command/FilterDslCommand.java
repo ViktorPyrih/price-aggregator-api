@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.conditions.InnerText;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
@@ -13,6 +14,7 @@ import java.util.Map;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+@EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class FilterDslCommand extends DslCommand<ElementsCollection, ElementsCollection> {
 

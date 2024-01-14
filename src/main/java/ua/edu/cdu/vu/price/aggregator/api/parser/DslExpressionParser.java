@@ -1,16 +1,16 @@
 package ua.edu.cdu.vu.price.aggregator.api.parser;
 
+import com.codeborne.selenide.ElementsCollection;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.*;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.function.Predicate.not;
 
 @Component
 public class DslExpressionParser {
@@ -26,15 +26,26 @@ public class DslExpressionParser {
 
     public <T> DslExpression<T> parse(@NonNull String selector, @NonNull List<String> otherSelectors) {
         DslExpression<T> dslExpression = new DslExpression<>();
-        List<DslExpression<Object>> otherDslExpressions = otherSelectors.stream()
-                .map(this::parse)
-                .toList();
+        List<DslExpression<Object>> otherDslExpressions = parseOtherDslExpressions(otherSelectors);
         Arrays.stream(selector.split(DSL_COMMAND_SEPARATOR))
                 .map(command -> command.split(DSL_INTER_COMMAND_SEPARATOR))
                 .map(args -> parseCommand(args, otherDslExpressions))
                 .forEach(dslExpression::addCommand);
 
         return dslExpression;
+    }
+
+    private List<DslExpression<Object>> parseOtherDslExpressions(List<String> otherSelectors) {
+        List<String> filteredSelectors = otherSelectors;
+        List<DslExpression<Object>> otherDslExpressions = new LinkedList<>();
+        for (String otherSelector : otherSelectors) {
+            filteredSelectors = filteredSelectors.stream()
+                    .filter(not(otherSelector::equals))
+                    .toList();
+            otherDslExpressions.add(parse(otherSelector, filteredSelectors));
+        }
+
+        return otherDslExpressions;
     }
 
     @SuppressWarnings("unchecked,rawtypes")
@@ -129,7 +140,7 @@ public class DslExpressionParser {
         return new AttributeDslCommand(args[1]);
     }
 
-    private UnionDslCommand createUnionCommand(String[] args, List<DslExpression<List<Object>>> otherDslExpressions) {
+    private UnionDslCommand createUnionCommand(String[] args, List<DslExpression<ElementsCollection>> otherDslExpressions) {
         return new UnionDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
     }
 

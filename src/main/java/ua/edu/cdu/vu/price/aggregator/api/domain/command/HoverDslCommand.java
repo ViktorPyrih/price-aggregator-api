@@ -1,12 +1,14 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.SelenideElement;
+import lombok.EqualsAndHashCode;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
 import java.util.Map;
 
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 public class HoverDslCommand extends DslCommand<SelenideElement, Void> {
 
     @Override
@@ -14,7 +16,9 @@ public class HoverDslCommand extends DslCommand<SelenideElement, Void> {
         if (isNull(input)) {
             throw new DslExecutionException("HOVER command executed on null input");
         }
+
         input.hover();
+
         return null;
     }
 }

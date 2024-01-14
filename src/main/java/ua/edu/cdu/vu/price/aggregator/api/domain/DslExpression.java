@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain;
 
+import lombok.EqualsAndHashCode;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.DslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.OpenDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@EqualsAndHashCode
 @SuppressWarnings("rawtypes,unchecked")
 public class DslExpression<T> {
 

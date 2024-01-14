@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 import static com.codeborne.selenide.Selenide.$$;
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class SelectDslCommand extends DslCommand<SelenideElement, ElementsCollection> {
 

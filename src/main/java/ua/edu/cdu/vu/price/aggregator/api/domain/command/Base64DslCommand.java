@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import lombok.EqualsAndHashCode;
 import org.springframework.core.io.FileSystemResource;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.util.FileUtils;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 public class Base64DslCommand extends DslCommand<Object, Object> {
 
     @Override

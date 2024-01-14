@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
@@ -14,6 +15,7 @@ import static com.codeborne.selenide.WebDriverRunner.driver;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@EqualsAndHashCode(callSuper = true)
 public class GroupByDslCommand extends DslCommand<ElementsCollection, List<ElementsCollection>> {
 
     private static final String PARENT_ID_MODE = "parent_id";

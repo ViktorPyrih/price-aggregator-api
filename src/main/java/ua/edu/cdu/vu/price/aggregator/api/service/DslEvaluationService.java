@@ -10,7 +10,6 @@ import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationResponse;
 import ua.edu.cdu.vu.price.aggregator.api.parser.DslExpressionParser;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Stream;
 
 @Service
@@ -22,9 +21,9 @@ public class DslEvaluationService {
     @Cacheable("dsl-evaluation-cache")
     public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
         String url = request.getTarget().url();
-        List<DslExpression<Void>> actions = Stream.ofNullable(request.getActions())
+        var actions = Stream.ofNullable(request.getActions())
                 .flatMap(Collection::stream)
-                .map(dslExpressionParser::<Void>parse)
+                .map(dslExpressionParser::<ua.edu.cdu.vu.price.aggregator.api.domain.Cacheable<String>>parse)
                 .toList();
         DslExpression<T> expression = dslExpressionParser.parse(request.getExpression(), request.getOtherExpressions());
 

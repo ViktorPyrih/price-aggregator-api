@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.SelenideElement;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 public class InputDslCommand extends DslCommand<SelenideElement, Void> {
 
     @NonNull

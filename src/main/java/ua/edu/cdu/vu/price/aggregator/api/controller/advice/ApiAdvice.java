@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.controller.advice;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,7 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @RestControllerAdvice
 public class ApiAdvice {
 
@@ -29,6 +31,7 @@ public class ApiAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({DslValidationException.class, DslExecutionException.class})
     public ProblemDetail handleDslExceptions(RuntimeException e) {
+        log.error("DSL exception occurred", e);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 

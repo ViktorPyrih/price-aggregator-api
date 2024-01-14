@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 public abstract class CompositeDslCommand<IN, OUT> extends DslCommand<IN, OUT> {
 
     private final DslExpression<IN> withExpression;

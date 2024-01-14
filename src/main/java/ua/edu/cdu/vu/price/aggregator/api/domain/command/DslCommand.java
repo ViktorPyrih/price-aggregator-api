@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import lombok.EqualsAndHashCode;
 import org.openqa.selenium.Dimension;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import static com.codeborne.selenide.WebDriverRunner.driver;
 
+@EqualsAndHashCode
 public abstract class DslCommand<IN, OUT> {
 
     public enum Option {

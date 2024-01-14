@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.SelenideElement;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
@@ -10,6 +11,7 @@ import java.util.Map;
 import static com.codeborne.selenide.Selenide.$;
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class ByIdDslCommand extends DslCommand<SelenideElement, SelenideElement> {
 

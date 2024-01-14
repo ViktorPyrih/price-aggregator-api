@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.ElementsCollection;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.WebElement;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
@@ -13,6 +14,7 @@ import java.util.Set;
 import static com.codeborne.selenide.WebDriverRunner.driver;
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class IgnoreDslCommand extends DslCommand<ElementsCollection, ElementsCollection> {
 

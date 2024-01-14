@@ -2,12 +2,14 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import lombok.EqualsAndHashCode;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
 import java.util.Map;
 
 import static java.util.Objects.isNull;
 
+@EqualsAndHashCode(callSuper = true)
 public class FirstDslCommand extends DslCommand<ElementsCollection, SelenideElement> {
 
     @Override
