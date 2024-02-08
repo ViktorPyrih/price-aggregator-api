@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.ProductsService;
+import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -20,6 +21,7 @@ public class ProductsController {
 
     protected final ProductsService productsService;
 
+    @ApiKeyRequired
     @RequestMapping(method = {GET, POST})
     public ProductsResponse getFilters(@PathVariable String marketplace,
                                        @PathVariable String category,

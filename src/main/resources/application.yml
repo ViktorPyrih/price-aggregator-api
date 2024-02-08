@@ -4,3 +4,4 @@ spring:
   profiles:
     include: marketplaceConfig
 selenide.headless: true
+api.key: ENC(isEh0rI7DYDevr398EXAL58p5a8OYRcohdnTvCMNlZ9CKxc59MmSyeV5bwfI9tSsAAeVmQYioh4Ek3ZiFR1y/w==)
