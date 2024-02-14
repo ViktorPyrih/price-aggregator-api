@@ -10,6 +10,7 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 
 @Component
@@ -24,7 +25,8 @@ public class DslExpressionParser {
         return parse(selector, List.of());
     }
 
-    public <T> DslExpression<T> parse(@NonNull String selector, @NonNull List<String> otherSelectors) {
+    public <T> DslExpression<T> parse(@NonNull String selector, List<String> otherSelectors) {
+        otherSelectors = ofNullable(otherSelectors).orElse(List.of());
         DslExpression<T> dslExpression = new DslExpression<>();
         List<DslExpression<Object>> otherDslExpressions = parseOtherDslExpressions(otherSelectors);
         Arrays.stream(selector.split(DSL_COMMAND_SEPARATOR))
