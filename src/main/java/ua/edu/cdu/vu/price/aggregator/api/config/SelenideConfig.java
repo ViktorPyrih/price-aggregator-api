@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SelenideConfig {
 
-    @Value("${selenide.headless}")
+    @Value("${price-aggregator-api.selenide.headless}")
     private boolean headless;
 
     @PostConstruct

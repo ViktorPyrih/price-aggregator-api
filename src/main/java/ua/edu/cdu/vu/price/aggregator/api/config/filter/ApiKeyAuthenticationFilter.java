@@ -27,7 +27,7 @@ public class ApiKeyAuthenticationFilter implements Filter {
 
     private final ObjectMapper objectMapper;
 
-    @Value("${api.key}")
+    @Value("${price-aggregator-api.api.key}")
     private String apiKey;
 
     @Override
