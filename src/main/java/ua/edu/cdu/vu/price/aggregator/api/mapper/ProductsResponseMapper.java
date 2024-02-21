@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
@@ -13,7 +14,8 @@ public interface ProductsResponseMapper {
 
     default ProductsResponse convertToResponse(List<Pair<String, String>> rawProducts) {
         return ProductsResponse.builder()
-                .products(rawProducts.stream()
+                .products(Stream.ofNullable(rawProducts)
+                        .flatMap(List::stream)
                         .map(pair -> ProductsResponse.Product.builder()
                                 .link(pair.getValue())
                                 .image(pair.getKey())

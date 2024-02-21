@@ -23,7 +23,7 @@ public class DslEvaluationService {
         String url = request.getTarget().url();
         var actions = Stream.ofNullable(request.getActions())
                 .flatMap(Collection::stream)
-                .map(dslExpressionParser::<ua.edu.cdu.vu.price.aggregator.api.domain.Cacheable<String>>parse)
+                .map(dslExpressionParser::<Void>parse)
                 .toList();
         DslExpression<T> expression = dslExpressionParser.parse(request.getExpression(), request.getOtherExpressions());
 

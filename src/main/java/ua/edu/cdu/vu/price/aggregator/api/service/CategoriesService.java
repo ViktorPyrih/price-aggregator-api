@@ -7,6 +7,8 @@ import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
 import ua.edu.cdu.vu.price.aggregator.api.domain.SelectorConfig;
 import ua.edu.cdu.vu.price.aggregator.api.dto.CategoriesResponse;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
+import ua.edu.cdu.vu.price.aggregator.api.exception.CategoryNotFoundException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 
 import java.util.List;
@@ -40,8 +42,12 @@ public class CategoriesService {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfigFunction.apply(marketplaceConfig), arguments);
 
-        return CategoriesResponse.builder()
-                .categories(dslEvaluationService.<List<String>>evaluate(request).getValue())
-                .build();
+        try {
+            return CategoriesResponse.builder()
+                    .categories(dslEvaluationService.<List<String>>evaluate(request).getValue())
+                    .build();
+        } catch (DslExecutionException e) {
+            throw new CategoryNotFoundException(marketplace, e, arguments.values());
+        }
     }
 }

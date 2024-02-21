@@ -7,6 +7,8 @@ import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
 import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.FiltersResponse;
+import ua.edu.cdu.vu.price.aggregator.api.exception.CategoryNotFoundException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.FilterResponseMapper;
 
@@ -30,8 +32,12 @@ public class FiltersService {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         var arguments = Map.of(CATEGORY, category, SUBCATEGORY_1, subcategory1, SUBCATEGORY_2, subcategory2);
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), marketplaceConfig.filters(), arguments);
-        var rawFilters = dslEvaluationService.<List<Pair<String, List<String>>>>evaluate(request).getValue();
 
-        return filterResponseMapper.convertToResponse(rawFilters);
+        try {
+            var rawFilters = dslEvaluationService.<List<Pair<String, List<String>>>>evaluate(request).getValue();
+            return filterResponseMapper.convertToResponse(rawFilters);
+        } catch (DslExecutionException e) {
+            throw new CategoryNotFoundException(marketplace, e, category, subcategory1, subcategory2);
+        }
     }
 }

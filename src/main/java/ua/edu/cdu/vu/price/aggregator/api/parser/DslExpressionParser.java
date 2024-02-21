@@ -55,10 +55,13 @@ public class DslExpressionParser {
         String command = args[0];
         var option = DslCommand.Option.parseOption(command);
         return switch (option) {
+            case ANY -> new AnyDslCommand();
             case ATTRIBUTE -> createAttributeCommand(args);
             case BASE64 -> new Base64DslCommand();
             case BY_ID -> createByIdCommand(args);
+            case BY_INDEX -> createByIndexCommand(args);
             case CLICK -> new ClickDslCommand();
+            case DISTINCT -> new DistinctDslCommand();
             case FILTER -> createFilterCommand(args);
             case FIRST -> new FirstDslCommand();
             case GROUP_BY -> createGroupByCommand(args);
@@ -69,24 +72,21 @@ public class DslExpressionParser {
             case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();
+            case TRIM -> new TrimDslCommand();
             case UNION -> createUnionCommand(args, otherDslExpressions);
+            case WAIT -> createWaitCommand(args);
         };
     }
 
     private FilterDslCommand createFilterCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("FILTER command accepts exactly one argument");
-        }
+        requireOneArgument(args);
         var argumentsMap = parseArgumentsAsMap(args[1]);
 
         return new FilterDslCommand(argumentsMap);
     }
 
     private IgnoreDslCommand createIgnoreCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("IGNORE command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         try {
             return new IgnoreDslCommand(parseArgumentsAsSet(args[1]));
         } catch (NumberFormatException e) {
@@ -95,55 +95,61 @@ public class DslExpressionParser {
     }
 
     private SelectDslCommand createSelectCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("SELECT command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         return new SelectDslCommand(args[1]);
     }
 
     private ByIdDslCommand createByIdCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("BY_ID command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         return new ByIdDslCommand(args[1]);
     }
 
     private GroupByDslCommand createGroupByCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("GROUP_BY command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         return new GroupByDslCommand(args[1]);
     }
 
     private JoinDslCommand createJoinCommand(String[] args, List<DslExpression<Iterable<Object>>> otherDslExpressions) {
-        if (args.length != 2) {
-            throw new DslValidationException("ZIP command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         return new JoinDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
     }
 
     private InputDslCommand createInputCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("BY_ID command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         return new InputDslCommand(parseArgumentsAsMap(args[1]));
     }
 
     private AttributeDslCommand createAttributeCommand(String[] args) {
-        if (args.length != 2) {
-            throw new DslValidationException("ATTRIBUTE command accepts exactly one argument");
-        }
-
+        requireOneArgument(args);
         return new AttributeDslCommand(args[1]);
     }
 
     private UnionDslCommand createUnionCommand(String[] args, List<DslExpression<ElementsCollection>> otherDslExpressions) {
         return new UnionDslCommand(otherDslExpressions, parseArgumentsAsMap(args[1]));
+    }
+
+    private WaitDslCommand createWaitCommand(String[] args) {
+        requireOneArgument(args);
+        return new WaitDslCommand(requireInteger(args[1]));
+    }
+
+    private ByIndexDslCommand createByIndexCommand(String[] args) {
+        requireOneArgument(args);
+        return new ByIndexDslCommand(requireInteger(args[1]));
+    }
+
+    private void requireOneArgument(String[] args) {
+        if (args.length != 2) {
+            throw new DslValidationException("%s command accepts exactly one argument".formatted(args[0]));
+        }
+    }
+
+    private int requireInteger(String arg) {
+        try {
+            return Integer.parseInt(arg);
+        } catch (NumberFormatException e) {
+            throw new DslValidationException("'%s' cannot be converted to integer".formatted(arg));
+        }
     }
 
     private Set<Integer> parseArgumentsAsSet(String arguments) {

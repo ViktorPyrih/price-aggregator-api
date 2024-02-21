@@ -4,8 +4,6 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.conditions.InnerText;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import ua.edu.cdu.vu.price.aggregator.api.util.InnerTextBySelector;
 
@@ -15,11 +13,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 @EqualsAndHashCode(callSuper = true)
-@RequiredArgsConstructor
 public class FilterDslCommand extends DslCommand<ElementsCollection, ElementsCollection> {
 
     private final String selector;
-    @NonNull
     private final String text;
 
     public FilterDslCommand(@NonNull Map<String, String> arguments) {
@@ -28,11 +24,7 @@ public class FilterDslCommand extends DslCommand<ElementsCollection, ElementsCol
     }
 
     @Override
-    public ElementsCollection execute(String url, ElementsCollection input, Map<String, Object> context) {
-        if (isNull(input)) {
-            throw new DslExecutionException("FILTER command executed on null input");
-        }
-
+    public ElementsCollection executeInternal(String url, ElementsCollection input, Map<String, Object> context) {
         String resolvedText = parse(text, context);
 
         if (isNull(resolvedText)) {

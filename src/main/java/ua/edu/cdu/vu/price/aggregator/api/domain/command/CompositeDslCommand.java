@@ -35,11 +35,7 @@ public abstract class CompositeDslCommand<IN, OUT> extends DslCommand<IN, OUT> {
     }
 
     @Override
-    public OUT execute(String url, IN input, Map<String, Object> context) {
-        if (isNull(input)) {
-            throw new DslExecutionException("ZIP command executed on null input");
-        }
-
+    public OUT executeInternal(String url, IN input, Map<String, Object> context) {
         IN withExpressionResult = withExpression.evaluate(url, context);
 
         if (isNull(withExpressionResult)) {

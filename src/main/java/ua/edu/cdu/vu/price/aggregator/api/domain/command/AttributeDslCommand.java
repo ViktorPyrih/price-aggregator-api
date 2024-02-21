@@ -9,8 +9,6 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
 import java.util.Map;
 
-import static java.util.Objects.isNull;
-
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class AttributeDslCommand extends DslCommand<Object, Object> {
@@ -19,11 +17,7 @@ public class AttributeDslCommand extends DslCommand<Object, Object> {
     private final String attribute;
 
     @Override
-    public Object execute(String url, Object input, Map<String, Object> context) {
-        if (isNull(input)) {
-            throw new DslExecutionException("Attribute command executed on null input");
-        }
-
+    public Object executeInternal(String url, Object input, Map<String, Object> context) {
         if (input instanceof SelenideElement element) {
             return element.getAttribute(attribute);
         }
@@ -34,6 +28,6 @@ public class AttributeDslCommand extends DslCommand<Object, Object> {
                     .toList();
         }
 
-        return null;
+        throw new DslExecutionException("ATTRIBUTE command executed on not supported input");
     }
 }

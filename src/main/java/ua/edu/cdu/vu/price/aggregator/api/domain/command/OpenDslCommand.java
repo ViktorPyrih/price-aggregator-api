@@ -8,14 +8,14 @@ import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.WebDriverRunner.hasWebDriverStarted;
 
 @EqualsAndHashCode(callSuper = true)
-public class OpenDslCommand extends DslCommand<Void, Void> {
+public class OpenDslCommand extends DslCommand<Object, Object> {
 
     @Override
-    public Void execute(String url, Void input, Map<String, Object> context) {
+    public Object executeInternal(String url, Object input, Map<String, Object> context) {
         if (!hasWebDriverStarted()) {
             open(url);
             resizeWindow();
         }
-        return null;
+        return StartDslCommand.STUB;
     }
 }

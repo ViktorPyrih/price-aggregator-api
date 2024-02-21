@@ -5,25 +5,29 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
+import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
 import java.util.Map;
 
 import static com.codeborne.selenide.Selenide.$;
-import static java.util.Objects.isNull;
 
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
-public class ByIdDslCommand extends DslCommand<SelenideElement, SelenideElement> {
+public class ByIdDslCommand extends DslCommand<Object, SelenideElement> implements StartDslCommand {
 
     @NonNull
     private final String id;
 
     @Override
-    public SelenideElement execute(String url, SelenideElement input, Map<String, Object> context) {
-        if (isNull(input)) {
+    public SelenideElement executeInternal(String url, Object input, Map<String, Object> context) {
+        if (input == STUB) {
             return $(By.id(id));
         }
 
-        return input.$(By.id(id));
+        if (input instanceof SelenideElement element) {
+            return element.$(By.id(id));
+        }
+
+        throw new DslExecutionException("BY_ID command executed on not supported input");
     }
 }

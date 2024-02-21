@@ -8,18 +8,13 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 
 import java.util.Map;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 @EqualsAndHashCode(callSuper = true)
 public class ScreenshotDslCommand extends DslCommand<Object, Object> {
 
     @Override
-    public Object execute(String url, Object input, Map<String, Object> context) {
-        if (isNull(input)) {
-            throw new DslExecutionException("SCREENSHOT command executed on null input");
-        }
-
+    public Object executeInternal(String url, Object input, Map<String, Object> context) {
         if (input instanceof SelenideElement element) {
             return screenshot(element);
         }
@@ -30,7 +25,7 @@ public class ScreenshotDslCommand extends DslCommand<Object, Object> {
                     .toList();
         }
 
-        return null;
+        throw new DslExecutionException("SCREENSHOT command executed on not supported input");
     }
 
     private FileSystemResource screenshot(SelenideElement element) {

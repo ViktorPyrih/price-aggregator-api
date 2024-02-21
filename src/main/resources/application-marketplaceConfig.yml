@@ -24,7 +24,7 @@ price-aggregator-api:
           - SELECT ul.list>li.match-li-href | GROUP_BY parent_id | TEXT
       products:
         filters:
-          template: SELECT .match-li-href | FILTER text=$(['filter_%d']) | FIRST | CLICK
+          template: SELECT .match-li-href | FILTER text=$(['value_%d']) | ANY | CLICK
         self:
           actions:
             - SELECT a.mainmenu-link | FILTER text=$(['category']) | FIRST | HOVER
@@ -33,8 +33,39 @@ price-aggregator-api:
             - BY_ID minPrice_ | INPUT value=$(['minPrice'])
             - BY_ID maxPrice_ | INPUT value=$(['maxPrice'])
             - BY_ID match_submit | CLICK
-            - SELECT div.page-num>a | FILTER text=$(['page']) | FIRST | CLICK
+            - SELECT div.page-num>a | FILTER text=$(['page']) | ANY | CLICK
           selector: SELECT div.model-short-div | SCREENSHOT | BASE64 | JOIN with=1
           other:
             - SELECT a.model-short-title | UNION with=1 | ATTRIBUTE href
             - SELECT td.model-short-info>div:nth-child(1)>a
+    hotline:
+      url: https://hotline.ua/ua/catalog/
+      categories:
+        selector: SELECT .catalog-search__sections-item | TEXT
+      subcategories-1:
+        selector: SELECT .catalog-sections__item | FILTER selector=.catalog-sections__name,text=$(['category']) | SELECT .catalog-sections-sub-catalog__title | TEXT
+      subcategories-2:
+        selector: SELECT .catalog-sections__item | FILTER selector=.catalog-sections__title,text=$(['category']) | FIRST | SELECT .catalog-sections__sub-catalog | FILTER selector=.catalog-sections-sub-catalog__title,text=$(['subcategory']) | FIRST | SELECT .catalog-sections-sub-catalog__item | TEXT
+      filters:
+        actions:
+          - SELECT .catalog-sections__item | FILTER selector=.catalog-sections__title,text=$(['category']) | FIRST | SELECT .catalog-sections__sub-catalog | FILTER selector=.catalog-sections-sub-catalog__title,text=$(['subcategory1']) | FIRST | SELECT .catalog-sections-sub-catalog__item | FILTER text=$(['subcategory2']) | FIRST | CLICK
+          - WAIT 2000
+          - SELECT .filters-expand | FIRST | CLICK
+        selector: SELECT .sidebar-filter__header-title-text | IGNORE 8 | TEXT | TRIM | JOIN with=1
+        other:
+          - SELECT .filter-checklist__item | GROUP_BY parent | TEXT | DISTINCT | IGNORE 2,9
+      products:
+        filters:
+          template: SELECT .sidebar-filters__item | FILTER selector=.sidebar-filter__header-title-text,text=$(['key_%d']) | ANY | SELECT .filter-checklist__item-name | FILTER text=$(['value_%d']) | ANY | CLICK
+        self:
+          actions:
+            - SELECT .catalog-sections__item | FILTER selector=.catalog-sections__title,text=$(['category']) | FIRST | SELECT .catalog-sections__sub-catalog | FILTER selector=.catalog-sections-sub-catalog__title,text=$(['subcategory1']) | FIRST | SELECT .catalog-sections-sub-catalog__item | FILTER text=$(['subcategory2']) | FIRST | CLICK
+            - WAIT 2000
+            - SELECT .filters-expand | FIRST | CLICK
+            - SELECT .filter-price__range-field | BY_INDEX 0 | INPUT value=$(['minPrice'])
+            - SELECT .filter-price__range-field | BY_INDEX 1 | INPUT value=$(['maxPrice'])
+            - SELECT .filter-price__range-btn | FIRST | CLICK
+            - SELECT .page | FILTER text=$(['page']) | FIRST | CLICK
+          selector: SELECT .list-item | SCREENSHOT | BASE64 | JOIN with=1
+          other:
+            - SELECT .item-title | ATTRIBUTE href | DISTINCT

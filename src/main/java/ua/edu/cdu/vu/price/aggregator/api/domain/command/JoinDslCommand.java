@@ -19,15 +19,15 @@ public class JoinDslCommand extends CompositeDslCommand<Iterable<Object>, List<P
 
     @Override
     protected List<Pair<Object, Object>> combine(Iterable<Object> input1, Iterable<Object> input2) {
-        long zipResultSize = Math.min(input1.spliterator().estimateSize(), input2.spliterator().estimateSize());
+        long joinResultSize = Math.min(input1.spliterator().estimateSize(), input2.spliterator().estimateSize());
 
         var inputIterator = input1.iterator();
         var withExpressionResultIterator = input2.iterator();
-        var zipResult = new LinkedList<Pair<Object, Object>>();
-        for (int i = 0; i < zipResultSize; i++) {
-            zipResult.add(ImmutablePair.of(inputIterator.next(), withExpressionResultIterator.next()));
+        var joinResult = new LinkedList<Pair<Object, Object>>();
+        for (int i = 0; i < joinResultSize; i++) {
+            joinResult.add(ImmutablePair.of(inputIterator.next(), withExpressionResultIterator.next()));
         }
 
-        return zipResult;
+        return joinResult;
     }
 }
