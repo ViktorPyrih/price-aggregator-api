@@ -66,6 +66,6 @@ price-aggregator-api:
             - SELECT .filter-price__range-field | BY_INDEX 1 | INPUT value=$(['maxPrice'])
             - SELECT .filter-price__range-btn | FIRST | CLICK
             - SELECT .page | FILTER text=$(['page']) | FIRST | CLICK
-          selector: SELECT .list-item | SCREENSHOT | BASE64 | JOIN with=1
+          selector: SELECT .list-body__content>div | SCREENSHOT | BASE64 | JOIN with=1
           other:
             - SELECT .item-title | ATTRIBUTE href | DISTINCT
