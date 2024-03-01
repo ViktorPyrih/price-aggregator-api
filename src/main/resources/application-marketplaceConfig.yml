@@ -50,10 +50,10 @@ price-aggregator-api:
         actions:
           - SELECT .catalog-sections__item | FILTER selector=.catalog-sections__title,text=$(['category']) | FIRST | SELECT .catalog-sections__sub-catalog | FILTER selector=.catalog-sections-sub-catalog__title,text=$(['subcategory1']) | FIRST | SELECT .catalog-sections-sub-catalog__item | FILTER text=$(['subcategory2']) | FIRST | CLICK
           - WAIT 2000
-          - SELECT .filters-expand | FIRST | CLICK
+          - SELECT .filters-expand | ANY | CLICK
         selector: SELECT .sidebar-filter__header-title-text | IGNORE 8 | TEXT | TRIM | JOIN with=1
         other:
-          - SELECT .filter-checklist__item | GROUP_BY parent | TEXT | DISTINCT | IGNORE 2,9
+          - SELECT .filter-checklist__item | GROUP_BY parent | TEXT | DISTINCT
       products:
         filters:
           template: SELECT .sidebar-filters__item | FILTER selector=.sidebar-filter__header-title-text,text=$(['key_%d']) | ANY | SELECT .filter-checklist__item-name | FILTER text=$(['value_%d']) | ANY | CLICK
@@ -61,7 +61,7 @@ price-aggregator-api:
           actions:
             - SELECT .catalog-sections__item | FILTER selector=.catalog-sections__title,text=$(['category']) | FIRST | SELECT .catalog-sections__sub-catalog | FILTER selector=.catalog-sections-sub-catalog__title,text=$(['subcategory1']) | FIRST | SELECT .catalog-sections-sub-catalog__item | FILTER text=$(['subcategory2']) | FIRST | CLICK
             - WAIT 2000
-            - SELECT .filters-expand | FIRST | CLICK
+            - SELECT .filters-expand | ANY | CLICK
             - SELECT .filter-price__range-field | BY_INDEX 0 | INPUT value=$(['minPrice'])
             - SELECT .filter-price__range-field | BY_INDEX 1 | INPUT value=$(['maxPrice'])
             - SELECT .filter-price__range-btn | FIRST | CLICK

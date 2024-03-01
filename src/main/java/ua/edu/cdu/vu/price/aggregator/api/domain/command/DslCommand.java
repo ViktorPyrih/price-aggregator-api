@@ -1,6 +1,8 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.openqa.selenium.Dimension;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
@@ -60,5 +62,10 @@ public abstract class DslCommand<IN, OUT> {
 
     final void resizeWindow() {
         driver().getWebDriver().manage().window().setSize(new Dimension(2048, 2048));
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 }

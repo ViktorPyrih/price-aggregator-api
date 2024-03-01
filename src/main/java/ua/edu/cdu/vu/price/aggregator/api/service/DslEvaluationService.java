@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslEvaluationScenario;
@@ -18,6 +19,9 @@ public class DslEvaluationService {
 
     private final DslExpressionParser dslExpressionParser;
 
+    @Value("${price-aggregator-api.dsl.evaluation.scenario.debug:false}")
+    private boolean debug;
+
     @Cacheable("dsl-evaluation-cache")
     public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
         String url = request.getTarget().url();
@@ -30,6 +34,7 @@ public class DslEvaluationService {
         try (var scenario = DslEvaluationScenario.<T>builder()
                 .actions(actions)
                 .expression(expression)
+                .debug(debug)
                 .build()) {
             return DslEvaluationResponse.<T>builder()
                     .value(scenario.run(url, request.getArguments()))

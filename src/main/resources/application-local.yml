@@ -1,0 +1,6 @@
+logging:
+  level:
+    ua.edu.cdu.vu.price.aggregator: DEBUG
+price-aggregator-api:
+  selenide.headless: true
+  dsl.evaluation.scenario.debug: false

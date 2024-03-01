@@ -29,6 +29,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     implementation "org.mapstruct:mapstruct:1.5.5.Final"
     implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'com.google.guava:guava:33.0.0-jre'
     implementation 'com.codeborne:selenide:7.0.4'
 
     // annotation processor

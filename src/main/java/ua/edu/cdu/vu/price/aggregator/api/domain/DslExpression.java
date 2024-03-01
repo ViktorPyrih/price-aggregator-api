@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.domain;
 
 import com.codeborne.selenide.ex.ElementNotFound;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.DslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.OpenDslCommand;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@ToString
 @EqualsAndHashCode
 @SuppressWarnings("rawtypes,unchecked")
 public class DslExpression<T> {
