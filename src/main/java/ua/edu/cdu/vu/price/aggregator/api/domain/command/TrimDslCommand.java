@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Map;
 public class TrimDslCommand extends DslCommand<Object, Object> {
 
     @Override
-    public Object executeInternal(String url, Object input, Map<String, Object> context) {
+    public Object executeInternal(String url, Object input, Map<String, Object> context, WebDriver webDriver) {
         if (input instanceof Iterable<?> iterable) {
             var result = new LinkedList<String>();
             for (Object object: iterable) {

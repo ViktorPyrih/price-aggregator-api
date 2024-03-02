@@ -7,14 +7,12 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import static com.codeborne.selenide.Selenide.closeWebDriver;
-import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.WebDriverRunner.driver;
 import static java.util.Objects.isNull;
 
 @Slf4j
@@ -32,6 +30,7 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
     List<DslExpression<Void>> actions;
     @NonNull DslExpression<T> expression;
     boolean debug;
+    @NonNull WebDriver webDriver;
 
     public T run(String url, Map<String, Object> context) {
         log.debug("DSL evaluation scenario started with url: {} and context: {}", url, context);
@@ -45,18 +44,18 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
                     .forEach(action -> {
                         log.debug("About to execute action: {}", action);
                         sleep(SECONDS_TO_SLEEP_BETWEEN_OPERATIONS);
-                        action.evaluate(url, context);
+                        action.evaluate(url, context, webDriver);
                         log.debug("Action: {} executed successfully", action);
                     });
-            log.debug("URL: {} will be cached", driver().url());
-            URL_CACHE.put(key, driver().url());
+            log.debug("URL: {} will be cached", webDriver.url());
+            URL_CACHE.put(key, webDriver.url());
         } else {
             log.debug("Cache hit detected for url: {}", urlFromCache);
-            open(urlFromCache);
+            webDriver.open(urlFromCache);
         }
 
         log.debug("About to execute main expression: {}", expression);
-        T result = expression.evaluate(url, context);
+        T result = expression.evaluate(url, context, webDriver);
         log.debug("Main expression: {} executed successfully", expression);
 
         return result;
@@ -68,7 +67,7 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
             log.debug("DSL evaluation scenario finished. About to sleep for debugging purposes for {} second(s)", SECONDS_TO_SLEEP_ON_CLOSE);
             sleep(SECONDS_TO_SLEEP_ON_CLOSE);
         }
-        closeWebDriver();
+        webDriver.close();
         log.debug("Web driver closed");
     }
 

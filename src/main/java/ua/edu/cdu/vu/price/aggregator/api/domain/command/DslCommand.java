@@ -3,17 +3,16 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.openqa.selenium.Dimension;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Arrays;
 import java.util.Map;
 
-import static com.codeborne.selenide.WebDriverRunner.driver;
 import static java.util.Objects.isNull;
 
 @EqualsAndHashCode
@@ -34,15 +33,15 @@ public abstract class DslCommand<IN, OUT> {
     private static final ExpressionParser PARSER = new SpelExpressionParser();
     private static final ParserContext PARSER_CONTEXT = new TemplateParserContext("$(", ")");
 
-    public final OUT execute(String url, IN input, Map<String, Object> context) {
+    public final OUT execute(String url, IN input, Map<String, Object> context, WebDriver webDriver) {
         if (isNull(input)) {
             return defaultValue();
         }
 
-        return executeInternal(url, input, context);
+        return executeInternal(url, input, context, webDriver);
     }
 
-    abstract OUT executeInternal(String url, IN input, Map<String, Object> context);
+    abstract OUT executeInternal(String url, IN input, Map<String, Object> context, WebDriver webDriver);
 
     OUT defaultValue() {
         return null;
@@ -58,10 +57,6 @@ public abstract class DslCommand<IN, OUT> {
         } catch (NumberFormatException e) {
             throw new DslValidationException("%s cannot be converted to integer".formatted(value));
         }
-    }
-
-    final void resizeWindow() {
-        driver().getWebDriver().manage().window().setSize(new Dimension(2048, 2048));
     }
 
     @Override

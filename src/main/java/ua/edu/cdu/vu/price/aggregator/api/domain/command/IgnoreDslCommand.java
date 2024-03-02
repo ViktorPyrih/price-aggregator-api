@@ -3,6 +3,7 @@ package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -16,7 +17,7 @@ public class IgnoreDslCommand extends DslCommand<Iterable<Object>, Iterable<Obje
     private final Set<Integer> indexes;
 
     @Override
-    public Iterable<Object> executeInternal(String url, Iterable<Object> input, Map<String, Object> context) {
+    public Iterable<Object> executeInternal(String url, Iterable<Object> input, Map<String, Object> context, WebDriver webDriver) {
         var iterator = input.iterator();
         var remainingElements = new LinkedList<>();
         for (int i = 0; iterator.hasNext(); i++) {

@@ -4,6 +4,7 @@ import com.codeborne.selenide.SelenideElement;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class InputDslCommand extends DslCommand<SelenideElement, Void> {
     }
 
     @Override
-    public Void executeInternal(String url, SelenideElement input, Map<String, Object> context) {
+    public Void executeInternal(String url, SelenideElement input, Map<String, Object> context, WebDriver webDriver) {
         String resolvedValue = parse(value, context);
         input.setValue(StringUtils.EMPTY);
         input.setValue(resolvedValue);

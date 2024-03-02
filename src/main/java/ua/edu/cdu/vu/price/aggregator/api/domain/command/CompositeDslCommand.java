@@ -5,6 +5,7 @@ import lombok.NonNull;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public abstract class CompositeDslCommand<IN, OUT> extends DslCommand<IN, OUT> {
     private final DslExpression<IN> withExpression;
 
     public CompositeDslCommand(@NonNull List<DslExpression<IN>> otherDslExpressions, @NonNull Map<String, String> arguments) {
-        if (otherDslExpressions.size() < 1) {
+        if (otherDslExpressions.isEmpty()) {
             throw new DslValidationException("%s command takes 'otherDslExpression' as a parameter".formatted(getClass().getSimpleName()));
         }
 
@@ -35,8 +36,8 @@ public abstract class CompositeDslCommand<IN, OUT> extends DslCommand<IN, OUT> {
     }
 
     @Override
-    public OUT executeInternal(String url, IN input, Map<String, Object> context) {
-        IN withExpressionResult = withExpression.evaluate(url, context);
+    public OUT executeInternal(String url, IN input, Map<String, Object> context, WebDriver webDriver) {
+        IN withExpressionResult = withExpression.evaluate(url, context, webDriver);
 
         if (isNull(withExpressionResult)) {
             throw new DslExecutionException("ZIP command executed on null input, returned after evaluation of 'with' expression");

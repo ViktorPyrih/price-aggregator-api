@@ -4,6 +4,7 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import lombok.EqualsAndHashCode;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
 public class TextDslCommand extends DslCommand<Object, Object> {
 
     @Override
-    public Object executeInternal(String url, Object input, Map<String, Object> context) {
+    public Object executeInternal(String url, Object input, Map<String, Object> context, WebDriver webDriver) {
         if (input instanceof Iterable<?> iterable) {
             var result = new ArrayList<>();
             for (var element: iterable) {

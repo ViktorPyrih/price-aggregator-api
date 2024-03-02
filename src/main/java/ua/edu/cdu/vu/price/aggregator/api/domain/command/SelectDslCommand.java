@@ -6,11 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Map;
-
-import static com.codeborne.selenide.Selenide.$$;
-import static com.codeborne.selenide.WebDriverRunner.driver;
 
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
@@ -20,13 +18,13 @@ public class SelectDslCommand extends DslCommand<Object, ElementsCollection> imp
     private final String selector;
 
     @Override
-    public ElementsCollection executeInternal(String url, Object input, Map<String, Object> context) {
+    public ElementsCollection executeInternal(String url, Object input, Map<String, Object> context, WebDriver webDriver) {
         if (input == STUB) {
-            return $$(selector);
+            return webDriver.getAllElementsByCssSelector(selector);
         }
 
         if (input instanceof ElementsCollection collection) {
-            return new ElementsCollection(driver(), collection.asFixedIterable().stream()
+            return new ElementsCollection(webDriver.unwrap(), collection.asFixedIterable().stream()
                     .map(element -> element.$$(selector))
                     .map(ElementsCollection::asFixedIterable)
                     .flatMap(ElementsCollection.SelenideElementIterable::stream)

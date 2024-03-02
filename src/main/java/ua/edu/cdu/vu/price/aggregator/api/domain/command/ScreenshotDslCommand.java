@@ -5,6 +5,7 @@ import com.codeborne.selenide.SelenideElement;
 import lombok.EqualsAndHashCode;
 import org.springframework.core.io.FileSystemResource;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import static java.util.Objects.requireNonNull;
 public class ScreenshotDslCommand extends DslCommand<Object, Object> {
 
     @Override
-    public Object executeInternal(String url, Object input, Map<String, Object> context) {
+    public Object executeInternal(String url, Object input, Map<String, Object> context, WebDriver webDriver) {
         if (input instanceof SelenideElement element) {
             return screenshot(element);
         }

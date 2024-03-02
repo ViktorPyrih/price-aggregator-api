@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import ua.edu.cdu.vu.price.aggregator.api.util.InnerTextBySelector;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class FilterDslCommand extends DslCommand<ElementsCollection, ElementsCol
     }
 
     @Override
-    public ElementsCollection executeInternal(String url, ElementsCollection input, Map<String, Object> context) {
+    public ElementsCollection executeInternal(String url, ElementsCollection input, Map<String, Object> context, WebDriver webDriver) {
         String resolvedText = parse(text, context);
 
         if (isNull(resolvedText)) {

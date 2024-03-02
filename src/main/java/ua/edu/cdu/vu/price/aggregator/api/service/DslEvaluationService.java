@@ -9,6 +9,7 @@ import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationResponse;
 import ua.edu.cdu.vu.price.aggregator.api.parser.DslExpressionParser;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 public class DslEvaluationService {
 
     private final DslExpressionParser dslExpressionParser;
+    private final WebDriver webDriver;
 
     @Value("${price-aggregator-api.dsl.evaluation.scenario.debug:false}")
     private boolean debug;
@@ -35,6 +37,7 @@ public class DslEvaluationService {
                 .actions(actions)
                 .expression(expression)
                 .debug(debug)
+                .webDriver(webDriver)
                 .build()) {
             return DslEvaluationResponse.<T>builder()
                     .value(scenario.run(url, request.getArguments()))

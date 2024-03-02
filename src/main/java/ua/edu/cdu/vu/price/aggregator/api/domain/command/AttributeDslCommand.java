@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class AttributeDslCommand extends DslCommand<Object, Object> {
     private final String attribute;
 
     @Override
-    public Object executeInternal(String url, Object input, Map<String, Object> context) {
+    public Object executeInternal(String url, Object input, Map<String, Object> context, WebDriver webDriver) {
         if (input instanceof SelenideElement element) {
             return element.getAttribute(attribute);
         }

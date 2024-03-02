@@ -9,6 +9,7 @@ import ua.edu.cdu.vu.price.aggregator.api.domain.command.OpenDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.StartDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,11 +31,11 @@ public class DslExpression<T> {
         };
     }
 
-    public T evaluate(String url, Map<String, Object> context) {
+    public T evaluate(String url, Map<String, Object> context, WebDriver webDriver) {
         Object result = StartDslCommand.STUB;
         try {
             for (var command : commands) {
-                result = command.execute(url, result, context);
+                result = command.execute(url, result, context, webDriver);
             }
 
             return (T) result;
@@ -42,7 +43,7 @@ public class DslExpression<T> {
             throw new DslExecutionException(e);
         } catch (ElementNotFound e) {
             log.error("Element not found. Retrying DSL expression evaluation...", e);
-            return evaluate(url, context);
+            return evaluate(url, context, webDriver);
         }
     }
 

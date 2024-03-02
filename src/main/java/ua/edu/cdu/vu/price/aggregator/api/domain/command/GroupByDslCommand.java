@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.codeborne.selenide.WebDriverRunner.driver;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @EqualsAndHashCode(callSuper = true)
@@ -61,11 +61,11 @@ public class GroupByDslCommand extends DslCommand<ElementsCollection, List<Eleme
     }
 
     @Override
-    public List<ElementsCollection> executeInternal(String url, ElementsCollection input, Map<String, Object> context) {
+    public List<ElementsCollection> executeInternal(String url, ElementsCollection input, Map<String, Object> context, WebDriver webDriver) {
         return input.asFixedIterable().stream()
                 .collect(Collectors.groupingBy(mode::extractKey, LinkedHashMap::new, Collectors.toUnmodifiableList()))
                 .values().stream()
-                .map(elements -> new ElementsCollection(driver(), elements))
+                .map(elements -> new ElementsCollection(webDriver.unwrap(), elements))
                 .toList();
     }
 }
