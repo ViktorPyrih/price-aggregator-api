@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.edu.cdu.vu.price.aggregator.api.dto.MarketplacesResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.MarketplacesService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
+import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 
 @RestController
+@ApiKeySecuritySchema
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/marketplaces")
 public class MarketplacesController {

@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.edu.cdu.vu.price.aggregator.api.dto.CategoriesResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.CategoriesService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
+import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 
 @RestController
+@ApiKeySecuritySchema
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/marketplaces/{marketplace}/categories")
 public class CategoriesController {

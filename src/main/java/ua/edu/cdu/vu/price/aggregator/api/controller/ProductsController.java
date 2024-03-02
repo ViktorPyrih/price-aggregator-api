@@ -9,12 +9,14 @@ import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.ProductsService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
+import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Validated
 @RestController
+@ApiKeySecuritySchema
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/marketplaces/{marketplace}/categories/{category}/categories/{subcategory1}/categories/{subcategory2}/products")
 public class ProductsController {

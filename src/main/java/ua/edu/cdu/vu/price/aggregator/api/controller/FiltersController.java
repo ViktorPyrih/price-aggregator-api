@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.edu.cdu.vu.price.aggregator.api.dto.FiltersResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.FiltersService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
+import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 
 @RestController
+@ApiKeySecuritySchema
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/marketplaces/{marketplace}/categories/{category}/categories/{subcategory1}/categories/{subcategory2}/filters")
 public class FiltersController {

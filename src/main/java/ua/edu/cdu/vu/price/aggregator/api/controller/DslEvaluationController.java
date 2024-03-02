@@ -11,11 +11,13 @@ import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.DslEvaluationService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
+import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
+@ApiKeySecuritySchema
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/dsl/evaluation")
 public class DslEvaluationController {
