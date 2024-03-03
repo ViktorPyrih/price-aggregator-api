@@ -16,6 +16,8 @@ public class ProductsResponse {
     public static class Product {
         String link;
         String image;
+        String price;
+        String description;
     }
 
 }

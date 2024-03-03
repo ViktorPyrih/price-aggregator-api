@@ -12,9 +12,13 @@ public class SelenideConfig {
     @Value("${price-aggregator-api.selenide.headless}")
     private boolean headless;
 
+    @Value("${price-aggregator-api.selenide.timeout}")
+    private int timeout;
+
     @PostConstruct
     public void init() {
         com.codeborne.selenide.Configuration.headless = headless;
+        com.codeborne.selenide.Configuration.timeout = timeout;
     }
 
     @Bean

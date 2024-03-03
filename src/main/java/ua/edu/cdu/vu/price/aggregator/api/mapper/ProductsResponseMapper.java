@@ -1,26 +1,35 @@
 package ua.edu.cdu.vu.price.aggregator.api.mapper;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.mapstruct.Mapper;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING)
 public interface ProductsResponseMapper {
 
-    default ProductsResponse convertToResponse(List<Pair<String, String>> rawProducts) {
+    default ProductsResponse convertToResponse(List<String> productLinks, List<String> productImages, List<String> productPrices, List<String> productDescriptions) {
+        int productsCount = min(productLinks.size(), productImages.size(), productPrices.size(), productDescriptions.size());
+
         return ProductsResponse.builder()
-                .products(Stream.ofNullable(rawProducts)
-                        .flatMap(List::stream)
-                        .map(pair -> ProductsResponse.Product.builder()
-                                .link(pair.getValue())
-                                .image(pair.getKey())
+                .products(IntStream.range(0, productsCount)
+                        .mapToObj(i -> ProductsResponse.Product.builder()
+                                .link(productLinks.get(i))
+                                .image(productImages.get(i))
+                                .price(productPrices.get(i))
+                                .description(productDescriptions.get(i))
                                 .build())
                         .toList())
                 .build();
+    }
+
+    private static int min(int... numbers) {
+        return Arrays.stream(numbers)
+                .min()
+                .orElseThrow();
     }
 }

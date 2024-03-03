@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.14.0'
     implementation 'com.google.guava:guava:33.0.0-jre'
     implementation 'com.codeborne:selenide:7.0.4'
+    implementation 'org.awaitility:awaitility:4.2.0'
 
     // annotation processor
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

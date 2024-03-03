@@ -72,6 +72,7 @@ public class DslExpressionParser {
             case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();
+            case TO_LIST -> new ToListDslCommand();
             case TRIM -> new TrimDslCommand();
             case UNION -> createUnionCommand(args, otherDslExpressions);
             case WAIT -> createWaitCommand(args);

@@ -1,10 +1,11 @@
 package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
 import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.ProductsSelectorConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.SelectorConfig;
 import ua.edu.cdu.vu.price.aggregator.api.domain.TemplateConfig;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
@@ -13,8 +14,11 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.CategoryNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.ProductsResponseMapper;
+import ua.edu.cdu.vu.price.aggregator.api.mapper.SelectorConfigMapper;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -34,17 +38,23 @@ public class ProductsService {
     private static final String MAX_PRICE = "maxPrice";
     private static final String PAGE = "page";
 
+    private final ExecutorService productsScrapingExecutor;
     private final MarketplaceConfigDao marketplaceConfigDao;
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
     private final ProductsResponseMapper productsResponseMapper;
+    private final SelectorConfigMapper selectorConfigMapper;
 
+    @SuppressWarnings("unchecked")
     public ProductsResponse getProducts(String marketplace, String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
 
-        DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), marketplaceConfig.products().self());
+        SelectorConfig linkSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::linkSelector);
+        SelectorConfig imageSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::imageSelector);
+        SelectorConfig priceSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::priceSelector);
+        SelectorConfig descriptionSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::descriptionSelector);
+
         List<Map.Entry<String, String>> filters = extractFilters(productsRequest);
-        DslEvaluationRequest request = enrichRequestWithFilterActions(rawRequest, marketplaceConfig.products().filters(), filters.size());
 
         Map<String, Object> arguments = new HashMap<>() {{
             put(CATEGORY, category);
@@ -55,13 +65,32 @@ public class ProductsService {
             put(PAGE, page);
         }};
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);
-        arguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
+        Map<String, Object> allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
+        var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
+                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
+                        e -> new CategoryNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
+                .toArray(CompletableFuture[]::new);
+        CompletableFuture.allOf(scrapingResults).join();
+        var results = Arrays.stream(scrapingResults)
+                .map(CompletableFuture::join)
+                .map(result -> (List<String>) result)
+                .toList();
+
+        return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3));
+    }
+
+    private List<String> scrapeProducts(MarketplaceConfig marketplaceConfig,
+                                        SelectorConfig selectorConfig,
+                                        List<Map.Entry<String, String>> filters,
+                                        Map<String, Object> arguments,
+                                        Function<DslExecutionException, CategoryNotFoundException> exceptionMapper) {
+        DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig);
+        DslEvaluationRequest request = enrichRequestWithFilterActions(rawRequest, marketplaceConfig.products().filters(), filters.size());
         try {
-            var rawProducts = dslEvaluationService.<List<Pair<String, String>>>evaluate(request.withArguments(arguments)).getValue();
-            return productsResponseMapper.convertToResponse(rawProducts);
+            return dslEvaluationService.<List<String>>evaluate(request.withArguments(arguments)).getValue();
         } catch (DslExecutionException e) {
-            throw new CategoryNotFoundException(marketplace, e, category, subcategory1, subcategory2);
+            throw exceptionMapper.apply(e);
         }
     }
 

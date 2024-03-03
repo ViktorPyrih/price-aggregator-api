@@ -34,16 +34,18 @@ price-aggregator-api:
             - BY_ID maxPrice_ | INPUT value=$(['maxPrice'])
             - BY_ID match_submit | CLICK
             - SELECT div.page-num>a | FILTER text=$(['page']) | ANY | CLICK
-          selector: SELECT div.model-short-div | SCREENSHOT | BASE64 | JOIN with=1
+          image-selector: SELECT div.model-short-div>table>tbody>tr>td:first-child>div:first-child | SCREENSHOT | BASE64
+          link-selector: SELECT a.model-short-title | UNION with=1 | ATTRIBUTE href
+          price-selector: SELECT div.model-short-div>table>tbody>tr>td:nth-child(3) | SCREENSHOT | BASE64
+          description-selector: SELECT div.model-short-div>table>tbody>tr>td:nth-child(2) | SCREENSHOT | BASE64
           other:
-            - SELECT a.model-short-title | UNION with=1 | ATTRIBUTE href
             - SELECT td.model-short-info>div:nth-child(1)>a
     hotline:
       url: https://hotline.ua/ua/catalog/
       categories:
         selector: SELECT .catalog-search__sections-item | TEXT
       subcategories-1:
-        selector: SELECT .catalog-sections__item | FILTER selector=.catalog-sections__name,text=$(['category']) | SELECT .catalog-sections-sub-catalog__title | TEXT
+        selector: SELECT .catalog-sections__item | FILTER selector=.catalog-sections__name,text=$(['category']) | SELECT .catalog-sections-sub-catalog__title | TEXT | TRIM
       subcategories-2:
         selector: SELECT .catalog-sections__item | FILTER selector=.catalog-sections__title,text=$(['category']) | FIRST | SELECT .catalog-sections__sub-catalog | FILTER selector=.catalog-sections-sub-catalog__title,text=$(['subcategory']) | FIRST | SELECT .catalog-sections-sub-catalog__item | TEXT
       filters:
@@ -66,6 +68,7 @@ price-aggregator-api:
             - SELECT .filter-price__range-field | BY_INDEX 1 | INPUT value=$(['maxPrice'])
             - SELECT .filter-price__range-btn | FIRST | CLICK
             - SELECT .page | FILTER text=$(['page']) | FIRST | CLICK
-          selector: SELECT .list-body__content>div | SCREENSHOT | BASE64 | JOIN with=1
-          other:
-            - SELECT .item-title | ATTRIBUTE href | DISTINCT
+          image-selector: SELECT .list-item__img,.promo-list-item__img | SCREENSHOT | BASE64 | TO_LIST
+          link-selector: SELECT .item-title,.promo-list-item__title | ATTRIBUTE href | DISTINCT | TO_LIST
+          price-selector: SELECT .list-item__value--overlay,.promo-list-item__value--overlay | SCREENSHOT | BASE64 | TO_LIST
+          description-selector: SELECT .list-item__info,.promo-list-item__info | SCREENSHOT | BASE64 | TO_LIST

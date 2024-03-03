@@ -35,6 +35,13 @@ public class MarketplaceConfigProperties {
 
     public record ProductsSelectorConfig(@NotNull @Valid TemplateConfig filters,
                                          @NotNull @Valid SelectorConfig self) {
+        public record SelectorConfig(List<@NotBlank String> actions,
+                                     @NotBlank String imageSelector,
+                                     @NotBlank String linkSelector,
+                                     @NotBlank String priceSelector,
+                                     @NotBlank String descriptionSelector,
+                                     List<@NotBlank String> other) {
+        }
     }
 
     public record TemplateConfig(@NotBlank String template) {

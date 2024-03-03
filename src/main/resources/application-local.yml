@@ -4,3 +4,4 @@ logging:
 price-aggregator-api:
   selenide.headless: true
   dsl.evaluation.scenario.debug: false
+  products.scrapping.concurrent: true

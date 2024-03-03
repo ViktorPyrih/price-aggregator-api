@@ -7,11 +7,14 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 
@@ -38,20 +41,22 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
         var key = new Cacheable<>(Optional.ofNullable(actions).orElse(Collections.emptyList()));
         String urlFromCache = URL_CACHE.getIfPresent(key);
 
-        if (isNull(urlFromCache)) {
-            Stream.ofNullable(actions)
-                    .flatMap(List::stream)
-                    .forEach(action -> {
-                        log.debug("About to execute action: {}", action);
-                        sleep(SECONDS_TO_SLEEP_BETWEEN_OPERATIONS);
-                        action.evaluate(url, context, webDriver);
-                        log.debug("Action: {} executed successfully", action);
-                    });
-            log.debug("URL: {} will be cached", webDriver.url());
-            URL_CACHE.put(key, webDriver.url());
-        } else {
-            log.debug("Cache hit detected for url: {}", urlFromCache);
-            webDriver.open(urlFromCache);
+        if (!CollectionUtils.isEmpty(actions)) {
+            if (isNull(urlFromCache)) {
+                actions.forEach(action -> {
+                    log.debug("About to execute action: {}", action);
+                    sleep(SECONDS_TO_SLEEP_BETWEEN_OPERATIONS);
+                    action.evaluate(url, context, webDriver);
+                    log.debug("Action: {} executed successfully", action);
+                });
+                if (webDriver.isStarted()) {
+                    log.debug("URL: {} will be cached", webDriver.url());
+                    URL_CACHE.put(key, webDriver.url());
+                }
+            } else {
+                log.debug("Cache hit detected for url: {}", urlFromCache);
+                webDriver.open(urlFromCache);
+            }
         }
 
         log.debug("About to execute main expression: {}", expression);
