@@ -10,6 +10,7 @@ import java.util.List;
 public class ProductsResponse {
 
     List<Product> products;
+    int pagesCount;
 
     @Value
     @Builder

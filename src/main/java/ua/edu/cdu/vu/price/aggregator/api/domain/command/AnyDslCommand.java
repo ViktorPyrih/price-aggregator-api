@@ -1,9 +1,11 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import lombok.EqualsAndHashCode;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 public class AnyDslCommand extends DslCommand<Iterable<Object>, Object> {
 
     @Override

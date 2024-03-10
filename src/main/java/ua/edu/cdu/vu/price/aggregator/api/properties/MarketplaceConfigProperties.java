@@ -40,6 +40,7 @@ public class MarketplaceConfigProperties {
                                      @NotBlank String linkSelector,
                                      @NotBlank String priceSelector,
                                      @NotBlank String descriptionSelector,
+                                     @NotBlank String pagesCountSelector,
                                      List<@NotBlank String> other) {
         }
     }

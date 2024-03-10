@@ -69,6 +69,7 @@ public class DslExpressionParser {
             case IGNORE -> createIgnoreCommand(args);
             case INPUT -> createInputCommand(args);
             case JOIN -> createJoinCommand(args, otherDslExpressions);
+            case LAST -> new LastDslCommand();
             case SCREENSHOT -> new ScreenshotDslCommand();
             case SELECT -> createSelectCommand(args);
             case TEXT -> new TextDslCommand();

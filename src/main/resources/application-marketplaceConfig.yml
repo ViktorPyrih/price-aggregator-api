@@ -38,6 +38,7 @@ price-aggregator-api:
           link-selector: SELECT a.model-short-title | UNION with=1 | ATTRIBUTE href
           price-selector: SELECT div.model-short-div>table>tbody>tr>td:nth-child(3) | SCREENSHOT | BASE64
           description-selector: SELECT div.model-short-div>table>tbody>tr>td:nth-child(2) | SCREENSHOT | BASE64
+          pages-count-selector: SELECT div.page-num>a | TEXT | LAST
           other:
             - SELECT td.model-short-info>div:nth-child(1)>a
     hotline:
@@ -72,3 +73,4 @@ price-aggregator-api:
           link-selector: SELECT .item-title,.promo-list-item__title | ATTRIBUTE href | DISTINCT | TO_LIST
           price-selector: SELECT .list-item__value--overlay,.promo-list-item__value--overlay | SCREENSHOT | BASE64 | TO_LIST
           description-selector: SELECT .list-item__info,.promo-list-item__info | SCREENSHOT | BASE64 | TO_LIST
+          pages-count-selector: SELECT .page | TEXT | TRIM | LAST

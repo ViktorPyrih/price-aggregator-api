@@ -12,7 +12,11 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface ProductsResponseMapper {
 
-    default ProductsResponse convertToResponse(List<String> productLinks, List<String> productImages, List<String> productPrices, List<String> productDescriptions) {
+    default ProductsResponse convertToResponse(List<String> productLinks,
+                                               List<String> productImages,
+                                               List<String> productPrices,
+                                               List<String> productDescriptions,
+                                               int pagesCount) {
         int productsCount = min(productLinks.size(), productImages.size(), productPrices.size(), productDescriptions.size());
 
         return ProductsResponse.builder()
@@ -24,6 +28,7 @@ public interface ProductsResponseMapper {
                                 .description(productDescriptions.get(i))
                                 .build())
                         .toList())
+                .pagesCount(pagesCount)
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+@EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 public class ByIndexDslCommand extends DslCommand<Iterable<Object>, Object> {
 
