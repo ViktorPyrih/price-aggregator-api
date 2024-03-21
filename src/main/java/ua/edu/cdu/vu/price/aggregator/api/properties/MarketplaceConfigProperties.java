@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Value
 @Validated
+@RefreshScope
 @ConfigurationProperties(prefix = "price-aggregator-api")
 public class MarketplaceConfigProperties {
 
