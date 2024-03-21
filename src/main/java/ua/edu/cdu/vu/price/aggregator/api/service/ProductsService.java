@@ -57,14 +57,7 @@ public class ProductsService {
 
         List<Map.Entry<String, String>> filters = extractFilters(productsRequest);
 
-        Map<String, Object> arguments = new HashMap<>() {{
-            put(CATEGORY, category);
-            put(SUBCATEGORY_1, subcategory1);
-            put(SUBCATEGORY_2, subcategory2);
-            put(MIN_PRICE, productsRequest.getMinPrice());
-            put(MAX_PRICE, productsRequest.getMaxPrice());
-            put(PAGE, page);
-        }};
+        Map<String, Object> arguments = createArgumentsMap(category, subcategory1, subcategory2, productsRequest, page);
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);
         Map<String, Object> allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
@@ -82,6 +75,17 @@ public class ProductsService {
                 .toList();
 
         return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3), pagesCount);
+    }
+
+    private Map<String, Object> createArgumentsMap(String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
+        return new HashMap<>() {{
+            put(CATEGORY, category);
+            put(SUBCATEGORY_1, subcategory1);
+            put(SUBCATEGORY_2, subcategory2);
+            put(MIN_PRICE, productsRequest.getMinPrice());
+            put(MAX_PRICE, productsRequest.getMaxPrice());
+            put(PAGE, page);
+        }};
     }
 
     private <T> T scrapeProducts(MarketplaceConfig marketplaceConfig,

@@ -3,6 +3,14 @@ spring:
     name: price-aggregator-api
   profiles:
     include: marketplaceConfig
+  cloud:
+    config:
+      uri: http://localhost:8888
+      username: config-service-client
+      password: ${CONFIG_SERVICE_SECRET}
+      fail-fast: true
+  config:
+    import: configserver:${spring.cloud.config.uri}
 price-aggregator-api:
   selenide:
     headless: true
