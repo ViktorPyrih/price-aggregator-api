@@ -4,6 +4,7 @@ import com.codeborne.selenide.ex.ElementNotFound;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.WebDriverException;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.DslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.OpenDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.StartDslCommand;
@@ -21,6 +22,8 @@ import java.util.Map;
 @SuppressWarnings("rawtypes,unchecked")
 public class DslExpression<T> {
 
+    private static final int MAX_ATTEMPTS = 3;
+
     private final List<DslCommand> commands;
 
     public DslExpression() {
@@ -32,19 +35,32 @@ public class DslExpression<T> {
     }
 
     public T evaluate(String url, Map<String, Object> context, WebDriver webDriver) {
+        return evaluate(url, context, webDriver, MAX_ATTEMPTS);
+    }
+
+    private T evaluate(String url, Map<String, Object> context, WebDriver webDriver, int attempts) {
         Object result = StartDslCommand.STUB;
         try {
             for (var command : commands) {
+                log.debug("About to execute command: {}", command);
                 result = command.execute(url, result, context, webDriver);
+                log.debug("Command: {} executed successfully", command);
             }
 
             return (T) result;
-        } catch (ClassCastException e) {
-            throw new DslExecutionException(e);
-        } catch (ElementNotFound e) {
-            log.error("Element not found. Retrying DSL expression evaluation...", e);
-            return evaluate(url, context, webDriver);
+        } catch (Throwable e) {
+            if (shouldRetry(e) && attempts > 0) {
+                log.error("Error occurred. Retrying DSL expression evaluation. Attempt: {}", attempts, e);
+                return evaluate(url, context, webDriver, attempts - 1);
+            } else {
+                throw new DslExecutionException(e);
+            }
         }
+    }
+
+    private boolean shouldRetry(Throwable e) {
+        return e instanceof ElementNotFound || e instanceof WebDriverException
+                || e.getCause() != null && e.getCause() instanceof WebDriverException;
     }
 
     public void addCommand(DslCommand command) {

@@ -10,7 +10,7 @@ import ua.edu.cdu.vu.price.aggregator.api.domain.TemplateConfig;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
-import ua.edu.cdu.vu.price.aggregator.api.exception.CategoryNotFoundException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.ProductsResponseMapper;
@@ -63,10 +63,10 @@ public class ProductsService {
 
         var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
                 .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
-                        e -> new CategoryNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
+                        e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
                 .toArray(CompletableFuture[]::new);
         int pagesCount = Integer.parseInt(scrapeProducts(marketplaceConfig, pagesCountSelectorConfig, filters, arguments,
-                e -> new CategoryNotFoundException(marketplace, page, e, category, subcategory1, subcategory2)));
+                e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2)));
 
         CompletableFuture.allOf(scrapingResults).join();
         var results = Arrays.stream(scrapingResults)
@@ -92,7 +92,7 @@ public class ProductsService {
                                  SelectorConfig selectorConfig,
                                  List<Map.Entry<String, String>> filters,
                                  Map<String, Object> arguments,
-                                 Function<DslExecutionException, CategoryNotFoundException> exceptionMapper) {
+                                 Function<DslExecutionException, CategoriesNotFoundException> exceptionMapper) {
         DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig);
         DslEvaluationRequest request = enrichRequestWithFilterActions(rawRequest, marketplaceConfig.products().filters(), filters.size());
         try {

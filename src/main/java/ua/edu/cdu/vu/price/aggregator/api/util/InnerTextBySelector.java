@@ -3,12 +3,15 @@ package ua.edu.cdu.vu.price.aggregator.api.util;
 import com.codeborne.selenide.CheckResult;
 import com.codeborne.selenide.Driver;
 import com.codeborne.selenide.WebElementCondition;
+import com.codeborne.selenide.ex.ElementNotFound;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
 import static com.codeborne.selenide.Selenide.$;
 
+@Slf4j
 public class InnerTextBySelector extends WebElementCondition {
 
     private static final String NAME_TEMPLATE = "%s selector=%s,text=%s";
@@ -27,9 +30,13 @@ public class InnerTextBySelector extends WebElementCondition {
     @NonNull
     @Override
     public CheckResult check(Driver driver, WebElement element) {
-        String elementInnerText = prepare($(element).$(selector).innerText());
-        if (elementInnerText.equals(innerText)) {
-            return CheckResult.accepted(elementInnerText);
+        try {
+            String elementInnerText = prepare($(element).$(selector).innerText());
+            if (elementInnerText.equals(innerText)) {
+                return CheckResult.accepted(elementInnerText);
+            }
+        } catch (ElementNotFound e) {
+            log.warn("Element not found by selector: '{}' in element: {}", selector, element);
         }
 
         return CheckResult.rejected("Inner text doesn't match: '%s' by selector: '%s'".formatted(innerText, selector), innerText);

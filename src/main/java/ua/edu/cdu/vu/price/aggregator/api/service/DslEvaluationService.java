@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import ua.edu.cdu.vu.price.aggregator.api.cache.ActionsUrlCacheManager;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslEvaluationScenario;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
@@ -20,6 +21,7 @@ public class DslEvaluationService {
 
     private final DslExpressionParser dslExpressionParser;
     private final WebDriver webDriver;
+    private final ActionsUrlCacheManager cacheManager;
 
     @Value("${price-aggregator-api.dsl.evaluation.scenario.debug:false}")
     private boolean debug;
@@ -38,6 +40,7 @@ public class DslEvaluationService {
                 .expression(expression)
                 .debug(debug)
                 .webDriver(webDriver)
+                .cacheManager(cacheManager)
                 .build()) {
             return DslEvaluationResponse.<T>builder()
                     .value(scenario.run(url, request.getArguments()))

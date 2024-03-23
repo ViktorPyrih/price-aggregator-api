@@ -5,11 +5,13 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.Dimension;
 
+import java.util.Optional;
+
 
 public interface WebDriver {
 
-    int WINDOW_WIDTH = 2048;
-    int WINDOW_HEIGHT = 2048;
+    int WINDOW_WIDTH = 4048;
+    int WINDOW_HEIGHT = 4048;
 
     void open(String url);
 
@@ -21,8 +23,16 @@ public interface WebDriver {
 
     Driver unwrap();
 
-    default String url() {
-        return unwrap().url();
+    default Optional<String> url() {
+        if (isStarted()) {
+            return Optional.of(unwrap().url());
+        }
+
+        return Optional.empty();
+    }
+
+    default String url(String defaultUrl) {
+        return url().orElse(defaultUrl);
     }
 
     default boolean isStarted() {

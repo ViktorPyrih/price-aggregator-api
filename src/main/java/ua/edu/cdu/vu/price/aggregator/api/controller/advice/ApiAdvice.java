@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ua.edu.cdu.vu.price.aggregator.api.exception.CategoryNotFoundException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 
@@ -37,9 +37,9 @@ public class ApiAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ProblemDetail handleCategoryNotFoundException(CategoryNotFoundException e) {
-        log.warn("Category not found", e);
+    @ExceptionHandler(CategoriesNotFoundException.class)
+    public ProblemDetail handleCategoryNotFoundException(CategoriesNotFoundException e) {
+        log.warn("Categories not found", e);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 

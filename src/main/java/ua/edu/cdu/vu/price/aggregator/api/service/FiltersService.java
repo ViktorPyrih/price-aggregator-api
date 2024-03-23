@@ -7,7 +7,7 @@ import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
 import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.FiltersResponse;
-import ua.edu.cdu.vu.price.aggregator.api.exception.CategoryNotFoundException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.FilterResponseMapper;
@@ -37,7 +37,7 @@ public class FiltersService {
             var rawFilters = dslEvaluationService.<List<Pair<String, List<String>>>>evaluate(request).getValue();
             return filterResponseMapper.convertToResponse(rawFilters);
         } catch (DslExecutionException e) {
-            throw new CategoryNotFoundException(marketplace, e, category, subcategory1, subcategory2);
+            throw new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2);
         }
     }
 }
