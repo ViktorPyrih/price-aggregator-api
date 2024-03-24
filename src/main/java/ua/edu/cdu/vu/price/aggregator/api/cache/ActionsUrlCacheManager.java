@@ -11,13 +11,13 @@ import static java.util.Objects.nonNull;
 
 public interface ActionsUrlCacheManager {
 
-    default Optional<Map.Entry<List<DslExpression<Void>>, String>> findUrlByActions(List<DslExpression<Void>> actions) {
+    default Optional<Map.Entry<List<DslExpression<Void>>, String>> findUrlByActionsAndContext(List<DslExpression<Void>> actions, Map<String, Object> context) {
         var mutableActions = new LinkedList<>(actions);
         var remainingActions = new LinkedList<DslExpression<Void>>();
         var listIterator = mutableActions.listIterator(mutableActions.size());
         while (listIterator.hasPrevious()) {
             var currentAction = listIterator.previous();
-            String url = getUrlByActions(mutableActions);
+            String url = getUrlByActions(serialize(mutableActions, context));
             if (nonNull(url)) {
                 return Optional.of(Map.entry(remainingActions, url));
             }
@@ -28,7 +28,17 @@ public interface ActionsUrlCacheManager {
         return Optional.empty();
     }
 
-    String getUrlByActions(List<DslExpression<Void>> actions);
+    default void put(List<DslExpression<Void>> actions, String url, Map<String, Object> context) {
+        putActions(serialize(actions, context), url);
+    }
 
-    void put(List<DslExpression<Void>> actions, String url);
+    String getUrlByActions(List<String> actions);
+
+    void putActions(List<String> actions, String url);
+
+    private List<String> serialize(List<DslExpression<Void>> actions, Map<String, Object> context) {
+        return actions.stream()
+                .map(action -> action.toString(context))
+                .toList();
+    }
 }

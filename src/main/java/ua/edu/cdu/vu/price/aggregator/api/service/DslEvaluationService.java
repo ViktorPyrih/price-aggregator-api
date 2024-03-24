@@ -13,11 +13,15 @@ import ua.edu.cdu.vu.price.aggregator.api.parser.DslExpressionParser;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class DslEvaluationService {
+
+    private static final String PROXY = "proxy";
 
     private final DslExpressionParser dslExpressionParser;
     private final WebDriver webDriver;
@@ -25,6 +29,9 @@ public class DslEvaluationService {
 
     @Value("${price-aggregator-api.dsl.evaluation.scenario.debug:false}")
     private boolean debug;
+
+    @Value("${price-aggregator-api.selenide.http.proxy:}")
+    private String proxy;
 
     @Cacheable("dsl-evaluation-cache")
     public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
@@ -34,6 +41,11 @@ public class DslEvaluationService {
                 .map(dslExpressionParser::<Void>parse)
                 .toList();
         DslExpression<T> expression = dslExpressionParser.parse(request.getExpression(), request.getOtherExpressions());
+        Map<String, Object> arguments = new HashMap<>(request.getArguments()) {{
+            if (!proxy.isBlank()) {
+                put(PROXY, proxy);
+            }
+        }};
 
         try (var scenario = DslEvaluationScenario.<T>builder()
                 .actions(actions)
@@ -43,7 +55,7 @@ public class DslEvaluationService {
                 .cacheManager(cacheManager)
                 .build()) {
             return DslEvaluationResponse.<T>builder()
-                    .value(scenario.run(url, request.getArguments()))
+                    .value(scenario.run(url, arguments))
                     .build();
         }
     }

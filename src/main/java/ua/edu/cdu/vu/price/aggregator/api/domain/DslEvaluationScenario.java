@@ -35,12 +35,12 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
         log.debug("DSL evaluation scenario started with url: {} and context: {}", url, context);
 
         if (!CollectionUtils.isEmpty(actions)) {
-            var urlAndRemainingActionsOptional = cacheManager.findUrlByActions(actions);
+            var urlAndRemainingActionsOptional = cacheManager.findUrlByActionsAndContext(actions, context);
             if (urlAndRemainingActionsOptional.isEmpty()) {
                 evaluateActions(url, context);
             } else {
                 var urlAndRemainingActions = urlAndRemainingActionsOptional.get();
-                log.debug("Cache hit detected for url: {} and actions: {}", urlAndRemainingActions.getValue(), urlAndRemainingActions.getKey());
+                log.debug("Cache hit detected for url: {}", urlAndRemainingActions.getValue());
                 webDriver.open(urlAndRemainingActions.getValue());
             }
         }
@@ -74,7 +74,7 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
             String currentUrl = webDriver.url(url);
             cachedActions.add(action);
             if (!currentUrl.equals(previousUrl)) {
-                cacheManager.put(cachedActions, currentUrl);
+                cacheManager.put(cachedActions, currentUrl, context);
             }
         }
     }

@@ -21,6 +21,8 @@ public interface WebDriver {
 
     SelenideElement getElementById(String id);
 
+    void setHttpProxy(String proxy);
+
     Driver unwrap();
 
     default Optional<String> url() {

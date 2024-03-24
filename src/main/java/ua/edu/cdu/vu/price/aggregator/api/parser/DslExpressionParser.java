@@ -27,7 +27,7 @@ public class DslExpressionParser {
 
     public <T> DslExpression<T> parse(@NonNull String selector, List<String> otherSelectors) {
         otherSelectors = ofNullable(otherSelectors).orElse(List.of());
-        DslExpression<T> dslExpression = new DslExpression<>();
+        DslExpression<T> dslExpression = new DslExpression<>(selector);
         List<DslExpression<Object>> otherDslExpressions = parseOtherDslExpressions(otherSelectors);
         Arrays.stream(selector.split(DSL_COMMAND_SEPARATOR))
                 .map(command -> command.split(DSL_INTER_COMMAND_SEPARATOR))

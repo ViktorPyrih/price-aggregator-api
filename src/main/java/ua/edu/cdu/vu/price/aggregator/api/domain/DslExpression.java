@@ -8,7 +8,6 @@ import org.openqa.selenium.WebDriverException;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.DslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.OpenDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.StartDslCommand;
-import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
@@ -24,12 +23,14 @@ public class DslExpression<T> {
 
     private static final int MAX_ATTEMPTS = 3;
 
+    private final String expression;
     private final List<DslCommand> commands;
 
-    public DslExpression() {
+    public DslExpression(String expression) {
+        this.expression = expression;
         this.commands = new LinkedList<>() {
             {
-                add(new OpenDslCommand());
+                add(OpenDslCommand.INSTANCE);
             }
         };
     }
@@ -53,7 +54,7 @@ public class DslExpression<T> {
                 log.error("Error occurred. Retrying DSL expression evaluation. Attempt: {}", attempts, e);
                 return evaluate(url, context, webDriver, attempts - 1);
             } else {
-                throw new DslExecutionException(e);
+                throw e;
             }
         }
     }
@@ -68,5 +69,10 @@ public class DslExpression<T> {
             throw new DslValidationException("Command: %s cannot be used as the first one".formatted(command.getClass().getSimpleName()));
         }
         commands.add(command);
+    }
+
+    public String toString(Map<String, Object> context) {
+        return context.entrySet().stream()
+                .reduce(expression, (expression, entry) -> expression.replace(entry.getKey(), entry.getValue().toString()), (expression1, expression2) -> expression2);
     }
 }

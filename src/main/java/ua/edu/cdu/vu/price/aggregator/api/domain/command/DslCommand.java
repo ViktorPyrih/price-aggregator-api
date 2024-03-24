@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.expression.ExpressionParser;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
+@Setter
 @EqualsAndHashCode
 public abstract class DslCommand<IN, OUT> {
 
