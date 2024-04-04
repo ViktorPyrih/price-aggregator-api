@@ -27,4 +27,9 @@ public class GuavaActionsUrlCacheManager implements ActionsUrlCacheManager {
         var key = new Cacheable<>(actions);
         cache.put(key, url);
     }
+
+    @Override
+    public void clear() {
+        cache.invalidateAll();
+    }
 }

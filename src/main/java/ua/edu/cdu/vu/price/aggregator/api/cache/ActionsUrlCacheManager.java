@@ -36,6 +36,8 @@ public interface ActionsUrlCacheManager {
 
     void putActions(List<String> actions, String url);
 
+    void clear();
+
     private List<String> serialize(List<DslExpression<Void>> actions, Map<String, Object> context) {
         return actions.stream()
                 .map(action -> action.toString(context))
