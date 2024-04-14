@@ -11,6 +11,7 @@ import java.util.Base64;
 @UtilityClass
 public class FileUtils {
 
+    @SuppressWarnings("all")
     public static String encodeAsBase64(File file) {
         try {
             return new String(Base64.getEncoder().encode(new FileInputStream(file).readAllBytes()));
