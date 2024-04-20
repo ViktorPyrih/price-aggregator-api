@@ -26,7 +26,7 @@ public class CategoriesController {
 
     @ApiKeyRequired
     @GetMapping("{category}/categories")
-    public CategoriesResponse getCategories(@PathVariable String marketplace, @PathVariable String category) {
+    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @PathVariable String category) {
         return categoriesService.getCategories(marketplace, category);
     }
 

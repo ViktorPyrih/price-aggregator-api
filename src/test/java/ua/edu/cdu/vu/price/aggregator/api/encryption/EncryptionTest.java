@@ -25,13 +25,13 @@ public class EncryptionTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = "price-aggregator-api-key")
+    @ValueSource(strings = "")
     void encrypt(String value) {
         System.out.println(ENCRYPTOR.encrypt(value));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = "sYK9iyxD5+gbhxraLq78JoERGXbwEyQmH0YS6dP+fmUYVfIWzAH5VKIEkDii2NUDPImLkdiHT0hIVyqOBNV06gGOu4T6HGtPCOPZyndmOfo=")
+    @ValueSource(strings = "")
     void decrypt(String value) {
         System.out.println(ENCRYPTOR.decrypt(value));
     }
