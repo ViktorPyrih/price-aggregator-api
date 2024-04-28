@@ -2,7 +2,6 @@ package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.cache.ActionsUrlCacheManager;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslEvaluationScenario;
@@ -33,7 +32,6 @@ public class DslEvaluationService {
     @Value("${price-aggregator-api.selenide.http.proxy:}")
     private String proxy;
 
-    @Cacheable("dsl-evaluation-cache")
     public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
         String url = request.getTarget().url();
         var actions = Stream.ofNullable(request.getActions())

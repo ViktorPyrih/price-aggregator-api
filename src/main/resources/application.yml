@@ -11,6 +11,10 @@ spring:
       fail-fast: true
   config:
     import: configserver:${spring.cloud.config.uri}
+  data:
+    redis:
+      host: localhost
+      port: 6379
 price-aggregator-api:
   selenide:
     headless: true

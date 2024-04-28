@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
 import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
@@ -26,14 +27,17 @@ public class CategoriesService {
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
 
+    @Cacheable("categories")
     public CategoriesResponse getCategories(String marketplace) {
         return getCategories(marketplace, MarketplaceConfig::categories, Map.of());
     }
 
+    @Cacheable("subcategories")
     public CategoriesResponse getCategories(String marketplace, String category) {
         return getCategories(marketplace, MarketplaceConfig::subcategories1, Map.of(CATEGORY, category));
     }
 
+    @Cacheable("subcategories2")
     public CategoriesResponse getCategories(String marketplace, String category, String subcategory) {
         return getCategories(marketplace, MarketplaceConfig::subcategories2, Map.of(CATEGORY, category, SUBCATEGORY, subcategory));
     }

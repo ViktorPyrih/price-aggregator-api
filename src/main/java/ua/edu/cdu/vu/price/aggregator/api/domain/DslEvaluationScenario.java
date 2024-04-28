@@ -44,6 +44,7 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
                 var actionIndexAndUrl = actionIndexAndUrlOptional.get();
                 log.debug("Cache hit detected for url: {}, index: {}", actionIndexAndUrl.getValue(), actionIndexAndUrl.getKey());
                 webDriver.open(actionIndexAndUrl.getValue());
+                webDriver.resizeWindow();
                 if (actionIndexAndUrl.getKey() != actions.size() - 1) {
                     evaluateActions(actionIndexAndUrl.getValue(), context, actionIndexAndUrl.getKey());
                 }

@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
 import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
@@ -28,6 +29,7 @@ public class FiltersService {
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
     private final FilterResponseMapper filterResponseMapper;
 
+    @Cacheable("filters")
     public FiltersResponse getFilters(String marketplace, String category, String subcategory1, String subcategory2) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         var arguments = Map.of(CATEGORY, category, SUBCATEGORY_1, subcategory1, SUBCATEGORY_2, subcategory2);
