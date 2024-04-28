@@ -62,7 +62,7 @@ public class DslExpressionParser {
             case BASE64 -> Base64DslCommand.INSTANCE;
             case BY_ID -> createByIdCommand(args);
             case BY_INDEX -> createByIndexCommand(args);
-            case CLICK -> ClickDslCommand.INSTANCE;
+            case CLICK -> createClickCommand(args);
             case DISTINCT -> DistinctDslCommand.INSTANCE;
             case FILTER -> createFilterCommand(args);
             case FIRST -> FirstDslCommand.INSTANCE;
@@ -141,6 +141,15 @@ public class DslExpressionParser {
     private ByIndexDslCommand createByIndexCommand(String[] args) {
         requireOneArgument(args);
         return new ByIndexDslCommand(requireInteger(args[1]));
+    }
+
+    private ClickDslCommand createClickCommand(String[] args) {
+        if (args.length == 1) {
+            return new ClickDslCommand(Map.of());
+        }
+        requireOneArgument(args);
+
+        return new ClickDslCommand(parseArgumentsAsMap(args[1]));
     }
 
     private void requireOneArgument(String[] args) {
