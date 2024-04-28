@@ -35,7 +35,7 @@ public class ScreenshotDslCommand extends DslCommand<Object, Object> {
     }
 
     private FileSystemResource screenshot(SelenideElement element) {
-        element.scrollIntoView(false);
+        element.scrollIntoView(true);
         return new FileSystemResource(requireNonNull(element.screenshot()));
     }
 }
