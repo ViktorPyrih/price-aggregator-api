@@ -18,17 +18,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @ApiKeySecuritySchema
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/marketplaces/{marketplace}/categories/{category}/categories/{subcategory1}/categories/{subcategory2}/products")
+@RequestMapping("/api/v1/marketplaces/{marketplace}/products")
 public class ProductsController {
 
     protected final ProductsService productsService;
 
     @ApiKeyRequired
     @RequestMapping(method = {GET, POST})
-    public ProductsResponse getFilters(@PathVariable String marketplace,
-                                       @PathVariable String category,
-                                       @PathVariable String subcategory1,
-                                       @PathVariable String subcategory2,
+    public ProductsResponse getProducts(@PathVariable String marketplace,
+                                       @RequestParam String category,
+                                       @RequestParam String subcategory1,
+                                       @RequestParam String subcategory2,
                                        @RequestBody @Valid ProductsRequest productsRequest,
                                        @RequestParam(required = false, defaultValue = "1") @Positive int page) {
         return productsService.getProducts(marketplace, category, subcategory1, subcategory2, productsRequest, page);

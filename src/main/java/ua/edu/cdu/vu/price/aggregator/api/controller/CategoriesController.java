@@ -1,10 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.edu.cdu.vu.price.aggregator.api.dto.CategoriesResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.CategoriesService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
@@ -25,14 +22,14 @@ public class CategoriesController {
     }
 
     @ApiKeyRequired
-    @GetMapping("{category}/categories")
-    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @PathVariable String category) {
+    @GetMapping(params = "category")
+    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @RequestParam String category) {
         return categoriesService.getCategories(marketplace, category);
     }
 
     @ApiKeyRequired
-    @GetMapping("{category}/categories/{subcategory}/categories")
-    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @PathVariable String category, @PathVariable String subcategory) {
+    @GetMapping(params = {"category", "subcategory"})
+    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @RequestParam String category, @RequestParam String subcategory) {
         return categoriesService.getCategories(marketplace, category, subcategory);
     }
 }

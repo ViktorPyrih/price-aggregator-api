@@ -16,7 +16,7 @@ public class ClickDslCommand extends DslCommand<SelenideElement, Void> {
 
     @Override
     Void executeInternal(String url, SelenideElement input, Map<String, Object> context, WebDriver webDriver) {
-        input.scrollIntoView(true);
+        input.scrollIntoView(false);
         input.click();
         return null;
     }

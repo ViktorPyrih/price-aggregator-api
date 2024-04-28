@@ -11,17 +11,17 @@ import static java.util.Objects.nonNull;
 
 public interface ActionsUrlCacheManager {
 
-    default Optional<Map.Entry<List<DslExpression<Void>>, String>> findUrlByActionsAndContext(List<DslExpression<Void>> actions, Map<String, Object> context) {
+    default Optional<Map.Entry<Integer, String>> findUrlByActionsAndContext(List<DslExpression<Void>> actions, Map<String, Object> context) {
         var mutableActions = new LinkedList<>(actions);
-        var remainingActions = new LinkedList<DslExpression<Void>>();
+        int currentIndex = mutableActions.size() - 1;
         var listIterator = mutableActions.listIterator(mutableActions.size());
         while (listIterator.hasPrevious()) {
-            var currentAction = listIterator.previous();
+            listIterator.previous();
             String url = getUrlByActions(serialize(mutableActions, context));
             if (nonNull(url)) {
-                return Optional.of(Map.entry(remainingActions, url));
+                return Optional.of(Map.entry(currentIndex, url));
             }
-            remainingActions.addFirst(currentAction);
+            currentIndex--;
             listIterator.remove();
         }
 

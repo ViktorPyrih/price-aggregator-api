@@ -15,8 +15,6 @@ price-aggregator-api:
   selenide:
     headless: true
     timeout: 4000
-    http:
-      proxy: 65.109.199.184:80
   api.key: ENC(isEh0rI7DYDevr398EXAL58p5a8OYRcohdnTvCMNlZ9CKxc59MmSyeV5bwfI9tSsAAeVmQYioh4Ek3ZiFR1y/w==)
 management:
   endpoints:

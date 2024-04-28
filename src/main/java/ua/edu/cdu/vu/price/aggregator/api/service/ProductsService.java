@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ProductsService {
 
+    private static final int FIRST_PAGE = 1;
     private static final String KEY_TEMPLATE = "key_%d";
     private static final String VALUE_TEMPLATE = "value_%d";
 
@@ -65,8 +66,12 @@ public class ProductsService {
                 .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
                         e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
                 .toArray(CompletableFuture[]::new);
-        int pagesCount = Integer.parseInt(scrapeProducts(marketplaceConfig, pagesCountSelectorConfig, filters, arguments,
-                e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2)));
+
+        String pagesCountText = scrapeProducts(marketplaceConfig, pagesCountSelectorConfig, filters, arguments,
+                e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2));
+        int pagesCount = Optional.ofNullable(pagesCountText)
+                .map(Integer::parseInt)
+                .orElse(FIRST_PAGE);
 
         CompletableFuture.allOf(scrapingResults).join();
         var results = Arrays.stream(scrapingResults)
