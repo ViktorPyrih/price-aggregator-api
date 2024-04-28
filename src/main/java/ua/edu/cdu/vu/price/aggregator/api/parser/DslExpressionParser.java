@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.parser;
 
 import com.codeborne.selenide.ElementsCollection;
 import lombok.NonNull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.*;
@@ -14,6 +15,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 
 @Component
+@Cacheable("dsl-expressions")
 public class DslExpressionParser {
 
     private static final String DSL_COMMAND_SEPARATOR = "\\s?\\|\\s?";
@@ -21,15 +23,15 @@ public class DslExpressionParser {
     private static final String DSL_ARGUMENTS_SEPARATOR = ",";
     private static final String DSL_ARGUMENT_SEPARATOR = "=";
 
-    public <T> DslExpression<T> parse(@NonNull String selector) {
-        return parse(selector, List.of());
+    public <T> DslExpression<T> parse(@NonNull String expression) {
+        return parse(expression, List.of());
     }
 
-    public <T> DslExpression<T> parse(@NonNull String selector, List<String> otherSelectors) {
+    public <T> DslExpression<T> parse(@NonNull String expression, List<String> otherSelectors) {
         otherSelectors = ofNullable(otherSelectors).orElse(List.of());
-        DslExpression<T> dslExpression = new DslExpression<>(selector);
+        DslExpression<T> dslExpression = new DslExpression<>(expression);
         List<DslExpression<Object>> otherDslExpressions = parseOtherDslExpressions(otherSelectors);
-        Arrays.stream(selector.split(DSL_COMMAND_SEPARATOR))
+        Arrays.stream(expression.split(DSL_COMMAND_SEPARATOR))
                 .map(command -> command.split(DSL_INTER_COMMAND_SEPARATOR))
                 .map(args -> parseCommand(args, otherDslExpressions))
                 .forEach(dslExpression::addCommand);
@@ -37,10 +39,10 @@ public class DslExpressionParser {
         return dslExpression;
     }
 
-    private List<DslExpression<Object>> parseOtherDslExpressions(List<String> otherSelectors) {
-        List<String> filteredSelectors = otherSelectors;
+    private List<DslExpression<Object>> parseOtherDslExpressions(List<String> otherExpressions) {
+        List<String> filteredSelectors = otherExpressions;
         List<DslExpression<Object>> otherDslExpressions = new LinkedList<>();
-        for (String otherSelector : otherSelectors) {
+        for (String otherSelector : otherExpressions) {
             filteredSelectors = filteredSelectors.stream()
                     .filter(not(otherSelector::equals))
                     .toList();

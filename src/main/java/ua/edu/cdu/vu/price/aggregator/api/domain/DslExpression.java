@@ -11,6 +11,7 @@ import ua.edu.cdu.vu.price.aggregator.api.domain.command.StartDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import java.util.Map;
 @ToString
 @EqualsAndHashCode
 @SuppressWarnings("rawtypes,unchecked")
-public class DslExpression<T> {
+public class DslExpression<T> implements Serializable {
 
     private static final int MAX_ATTEMPTS = 3;
 

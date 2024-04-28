@@ -11,6 +11,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import static java.util.Objects.isNull;
 
 @Setter
 @EqualsAndHashCode
-public abstract class DslCommand<IN, OUT> {
+public abstract class DslCommand<IN, OUT> implements Serializable {
 
     public enum Option {
 
