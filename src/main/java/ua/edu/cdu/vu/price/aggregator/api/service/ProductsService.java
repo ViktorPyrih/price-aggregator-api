@@ -56,22 +56,22 @@ public class ProductsService {
         SelectorConfig descriptionSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::descriptionSelector);
         SelectorConfig pagesCountSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::pagesCountSelector);
 
-        List<Map.Entry<String, String>> filters = extractFilters(productsRequest);
+        List<Map.Entry<String, String>> filters = extractFilters(productsRequest, subcategory2);
 
         Map<String, Object> arguments = createArgumentsMap(category, subcategory1, subcategory2, productsRequest, page);
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);
         Map<String, Object> allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
-
-        var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
-                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
-                        e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
-                .toArray(CompletableFuture[]::new);
 
         String pagesCountText = scrapeProducts(marketplaceConfig, pagesCountSelectorConfig, filters, arguments,
                 e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2));
         int pagesCount = Optional.ofNullable(pagesCountText)
                 .map(Integer::parseInt)
                 .orElse(FIRST_PAGE);
+
+        var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
+                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
+                        e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
+                .toArray(CompletableFuture[]::new);
 
         CompletableFuture.allOf(scrapingResults).join();
         var results = Arrays.stream(scrapingResults)
@@ -107,12 +107,13 @@ public class ProductsService {
         }
     }
 
-    private List<Map.Entry<String, String>> extractFilters(ProductsRequest request) {
+    private List<Map.Entry<String, String>> extractFilters(ProductsRequest request, String subcategory2) {
         return Stream.ofNullable(request.getFilters())
                 .flatMap(List::stream)
                 .flatMap(filter -> filter.getValues().stream()
                         .map(value -> Map.entry(filter.getKey(), value)))
                 .distinct()
+                .filter(entry -> !entry.getValue().equals(subcategory2))
                 .toList();
     }
 
