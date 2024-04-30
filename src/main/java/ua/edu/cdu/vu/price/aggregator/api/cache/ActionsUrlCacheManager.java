@@ -11,7 +11,7 @@ import static java.util.Objects.nonNull;
 
 public interface ActionsUrlCacheManager {
 
-    default Optional<Map.Entry<Integer, String>> findUrlByActionsAndContext(List<DslExpression<Void>> actions, Map<String, Object> context) {
+    default Optional<Map.Entry<Integer, String>> findUrlByActionsAndContext(List<DslExpression<Object>> actions, Map<String, Object> context) {
         var mutableActions = new LinkedList<>(actions);
         int currentIndex = mutableActions.size() - 1;
         var listIterator = mutableActions.listIterator(mutableActions.size());
@@ -28,7 +28,7 @@ public interface ActionsUrlCacheManager {
         return Optional.empty();
     }
 
-    default void put(List<DslExpression<Void>> actions, String url, Map<String, Object> context) {
+    default void put(List<DslExpression<Object>> actions, String url, Map<String, Object> context) {
         putActions(serialize(actions, context), url);
     }
 
@@ -38,7 +38,7 @@ public interface ActionsUrlCacheManager {
 
     void clear();
 
-    private List<String> serialize(List<DslExpression<Void>> actions, Map<String, Object> context) {
+    private List<String> serialize(List<DslExpression<Object>> actions, Map<String, Object> context) {
         return actions.stream()
                 .map(action -> action.toString(context))
                 .toList();

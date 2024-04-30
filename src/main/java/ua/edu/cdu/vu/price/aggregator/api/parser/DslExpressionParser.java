@@ -64,6 +64,7 @@ public class DslExpressionParser {
             case BY_INDEX -> createByIndexCommand(args);
             case CLICK -> createClickCommand(args);
             case DISTINCT -> DistinctDslCommand.INSTANCE;
+            case ENTER -> EnterDslCommand.INSTANCE;
             case FILTER -> createFilterCommand(args);
             case FIRST -> FirstDslCommand.INSTANCE;
             case GROUP_BY -> createGroupByCommand(args);

@@ -5,5 +5,6 @@ public record MarketplaceConfig(String url,
                                 SelectorConfig subcategories1,
                                 SelectorConfig subcategories2,
                                 SelectorConfig filters,
-                                ProductsSelectorConfig products) {
+                                ProductsSelectorConfig products,
+                                SearchSelectorConfig search) {
 }

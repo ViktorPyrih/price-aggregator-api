@@ -27,7 +27,8 @@ public class MarketplaceConfigProperties {
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories1,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories2,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig filters,
-                       @NotNull @Valid MarketplaceConfigProperties.ProductsSelectorConfig products) {
+                       @NotNull @Valid MarketplaceConfigProperties.ProductsSelectorConfig products,
+                       @Valid MarketplaceConfigProperties.SearchSelectorConfig search) {
     }
 
     public record SelectorConfig(List<@NotBlank String> actions,
@@ -37,6 +38,7 @@ public class MarketplaceConfigProperties {
 
     public record ProductsSelectorConfig(@NotNull @Valid TemplateConfig filters,
                                          @NotNull @Valid SelectorConfig self) {
+
         public record SelectorConfig(List<@NotBlank String> actions,
                                      @NotBlank String imageSelector,
                                      @NotBlank String linkSelector,
@@ -45,6 +47,15 @@ public class MarketplaceConfigProperties {
                                      @NotBlank String pagesCountSelector,
                                      List<@NotBlank String> other) {
         }
+    }
+
+    public record SearchSelectorConfig(List<@NotBlank String> actions,
+                                       @NotBlank String imageSelector,
+                                       @NotBlank String linkSelector,
+                                       @NotBlank String priceSelector,
+                                       @NotBlank String descriptionSelector,
+                                       @NotBlank String pagesCountSelector,
+                                       List<@NotBlank String> other) {
     }
 
     public record TemplateConfig(@NotBlank String template) {

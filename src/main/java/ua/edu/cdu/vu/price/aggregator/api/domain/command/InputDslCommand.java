@@ -11,7 +11,7 @@ import java.util.Map;
 import static java.util.Objects.*;
 
 @EqualsAndHashCode(callSuper = true)
-public class InputDslCommand extends DslCommand<SelenideElement, Void> {
+public class InputDslCommand extends DslCommand<SelenideElement, SelenideElement> {
 
     private final String value;
 
@@ -20,10 +20,10 @@ public class InputDslCommand extends DslCommand<SelenideElement, Void> {
     }
 
     @Override
-    public Void executeInternal(String url, SelenideElement input, Map<String, Object> context, WebDriver webDriver) {
+    public SelenideElement executeInternal(String url, SelenideElement input, Map<String, Object> context, WebDriver webDriver) {
         String resolvedValue = parse(value, context);
         input.setValue(StringUtils.EMPTY);
         input.setValue(resolvedValue);
-        return null;
+        return input;
     }
 }

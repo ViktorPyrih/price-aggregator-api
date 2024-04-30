@@ -24,7 +24,7 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
     private static final int SECONDS_TO_SLEEP_BETWEEN_OPERATIONS = 5;
     private static final int SECONDS_TO_SLEEP_ON_CLOSE = 100;
 
-    List<DslExpression<Void>> actions;
+    List<DslExpression<Object>> actions;
     @NonNull
     DslExpression<T> expression;
     boolean debug;

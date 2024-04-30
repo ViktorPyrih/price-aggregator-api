@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 @Value
@@ -22,4 +23,10 @@ public class ProductsResponse implements Serializable {
         String description;
     }
 
+    public static ProductsResponse empty() {
+        return ProductsResponse.builder()
+                .products(Collections.emptyList())
+                .pagesCount(1)
+                .build();
+    }
 }

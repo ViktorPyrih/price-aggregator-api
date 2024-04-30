@@ -3,10 +3,7 @@ package ua.edu.cdu.vu.price.aggregator.api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
-import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.ProductsSelectorConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.SelectorConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.TemplateConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.*;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
@@ -24,6 +21,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @RequiredArgsConstructor
 public class ProductsService {
@@ -38,6 +37,7 @@ public class ProductsService {
     private static final String MIN_PRICE = "minPrice";
     private static final String MAX_PRICE = "maxPrice";
     private static final String PAGE = "page";
+    private static final String QUERY = "query";
 
     private final ExecutorService productsScrapingExecutor;
     private final MarketplaceConfigDao marketplaceConfigDao;
@@ -46,7 +46,40 @@ public class ProductsService {
     private final ProductsResponseMapper productsResponseMapper;
     private final SelectorConfigMapper selectorConfigMapper;
 
-    @SuppressWarnings("unchecked")
+    public ProductsResponse search(String query) {
+        return marketplaceConfigDao.getAllMarketplaces().stream()
+                .parallel()
+                .map(marketplaceConfigDao::load)
+                .filter(marketplaceConfig -> nonNull(marketplaceConfig.search()))
+                .map(marketplaceConfig -> search(marketplaceConfig, query))
+                .reduce(ProductsResponse.empty(), ProductsService::merge);
+    }
+
+    private ProductsResponse search(MarketplaceConfig marketplaceConfig, String query) {
+
+        SelectorConfig linkSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::linkSelector);
+        SelectorConfig imageSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::imageSelector);
+        SelectorConfig priceSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::priceSelector);
+        SelectorConfig descriptionSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::descriptionSelector);
+
+        Map<String, Object> arguments = Map.of(QUERY, query);
+
+        var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
+                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, arguments), productsScrapingExecutor))
+                .toArray(CompletableFuture[]::new);
+
+        var results = getResults(scrapingResults);
+
+        return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3));
+    }
+
+    private static ProductsResponse merge(ProductsResponse response1, ProductsResponse response2) {
+        return ProductsResponse.builder()
+                .products(Stream.concat(response1.getProducts().stream(), response2.getProducts().stream()).toList())
+                .pagesCount(FIRST_PAGE)
+                .build();
+    }
+
     public ProductsResponse getProducts(String marketplace, String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
 
@@ -58,9 +91,9 @@ public class ProductsService {
 
         List<Map.Entry<String, String>> filters = extractFilters(productsRequest, subcategory2);
 
-        Map<String, Object> arguments = createArgumentsMap(category, subcategory1, subcategory2, productsRequest, page);
+        var arguments = createArgumentsMap(category, subcategory1, subcategory2, productsRequest, page);
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);
-        Map<String, Object> allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
+        var allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
         String pagesCountText = scrapeProducts(marketplaceConfig, pagesCountSelectorConfig, filters, arguments,
                 e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2));
@@ -73,13 +106,18 @@ public class ProductsService {
                         e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
                 .toArray(CompletableFuture[]::new);
 
+        var results = getResults(scrapingResults);
+
+        return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3), pagesCount);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<List<String>> getResults(CompletableFuture<?>[] scrapingResults) {
         CompletableFuture.allOf(scrapingResults).join();
-        var results = Arrays.stream(scrapingResults)
+        return Arrays.stream(scrapingResults)
                 .map(CompletableFuture::join)
                 .map(result -> (List<String>) result)
                 .toList();
-
-        return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3), pagesCount);
     }
 
     private Map<String, Object> createArgumentsMap(String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
@@ -95,9 +133,15 @@ public class ProductsService {
 
     private <T> T scrapeProducts(MarketplaceConfig marketplaceConfig,
                                  SelectorConfig selectorConfig,
+                                 Map<String, Object> arguments) {
+        return scrapeProducts(marketplaceConfig, selectorConfig, Collections.emptyList(), arguments, e -> e);
+    }
+
+    private <T> T scrapeProducts(MarketplaceConfig marketplaceConfig,
+                                 SelectorConfig selectorConfig,
                                  List<Map.Entry<String, String>> filters,
                                  Map<String, Object> arguments,
-                                 Function<DslExecutionException, CategoriesNotFoundException> exceptionMapper) {
+                                 Function<DslExecutionException, RuntimeException> exceptionMapper) {
         DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig);
         DslEvaluationRequest request = enrichRequestWithFilterActions(rawRequest, marketplaceConfig.products().filters(), filters.size());
         try {
@@ -118,6 +162,10 @@ public class ProductsService {
     }
 
     private DslEvaluationRequest enrichRequestWithFilterActions(DslEvaluationRequest request, TemplateConfig templateConfig, int filtersCount) {
+        if (filtersCount == 0) {
+            return request;
+        }
+
         var dynamicActions = IntStream.range(0, filtersCount)
                 .mapToObj(index -> templateConfig.template().formatted(index, index));
         var actions = Stream.of(
@@ -126,6 +174,7 @@ public class ProductsService {
                         request.getActions().subList(request.getActions().size() - 3, request.getActions().size()).stream())
                 .flatMap(Function.identity())
                 .toList();
+
         return request.withActions(actions);
     }
 

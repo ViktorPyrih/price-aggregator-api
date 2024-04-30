@@ -36,7 +36,7 @@ public class DslEvaluationService {
         String url = request.getTarget().url();
         var actions = Stream.ofNullable(request.getActions())
                 .flatMap(Collection::stream)
-                .map(dslExpressionParser::<Void>parse)
+                .map(dslExpressionParser::parse)
                 .toList();
         DslExpression<T> expression = dslExpressionParser.parse(request.getExpression(), request.getOtherExpressions());
         Map<String, Object> arguments = new HashMap<>(request.getArguments()) {{

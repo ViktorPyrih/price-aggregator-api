@@ -23,7 +23,7 @@ public abstract class DslCommand<IN, OUT> implements Serializable {
 
     public enum Option {
 
-        ANY, ATTRIBUTE, BASE64, BY_ID, BY_INDEX, CLICK, DISTINCT, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, INPUT, JOIN, LAST, SELECT, TEXT, TO_LIST, TRIM, SCREENSHOT, UNION, VISIBLE, WAIT;
+        ANY, ATTRIBUTE, BASE64, BY_ID, BY_INDEX, CLICK, DISTINCT, ENTER, FILTER, FIRST, GROUP_BY, HOVER, IGNORE, INPUT, JOIN, LAST, SELECT, TEXT, TO_LIST, TRIM, SCREENSHOT, UNION, VISIBLE, WAIT;
 
         public static Option parseOption(String name) {
             return Arrays.stream(values())

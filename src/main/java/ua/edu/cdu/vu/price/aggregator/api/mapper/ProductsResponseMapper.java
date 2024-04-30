@@ -32,6 +32,13 @@ public interface ProductsResponseMapper {
                 .build();
     }
 
+    default ProductsResponse convertToResponse(List<String> productLinks,
+                                               List<String> productImages,
+                                               List<String> productPrices,
+                                               List<String> productDescriptions) {
+        return convertToResponse(productLinks, productImages, productPrices, productDescriptions, 1);
+    }
+
     private static int min(int... numbers) {
         return Arrays.stream(numbers)
                 .min()
