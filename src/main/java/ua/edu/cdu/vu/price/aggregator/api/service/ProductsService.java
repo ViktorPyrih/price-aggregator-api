@@ -39,7 +39,7 @@ public class ProductsService {
     private static final String PAGE = "page";
     private static final String QUERY = "query";
 
-    private final ExecutorService productsScrapingExecutor;
+    private final ExecutorService taskExecutor;
     private final MarketplaceConfigDao marketplaceConfigDao;
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
@@ -47,11 +47,17 @@ public class ProductsService {
     private final SelectorConfigMapper selectorConfigMapper;
 
     public ProductsResponse search(String query) {
-        return marketplaceConfigDao.getAllMarketplaces().stream()
-                .parallel()
+        var futures = marketplaceConfigDao.getAllMarketplaces().stream()
                 .map(marketplaceConfigDao::load)
                 .filter(marketplaceConfig -> nonNull(marketplaceConfig.search()))
-                .map(marketplaceConfig -> search(marketplaceConfig, query))
+                .map(marketplaceConfig -> CompletableFuture.supplyAsync(() -> search(marketplaceConfig, query), taskExecutor))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(futures).join();
+
+        return Arrays.stream(futures)
+                .map(CompletableFuture::join)
+                .map(response -> (ProductsResponse) response)
                 .reduce(ProductsResponse.empty(), ProductsService::merge);
     }
 
@@ -65,7 +71,7 @@ public class ProductsService {
         Map<String, Object> arguments = Map.of(QUERY, query);
 
         var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
-                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, arguments), productsScrapingExecutor))
+                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, arguments), taskExecutor))
                 .toArray(CompletableFuture[]::new);
 
         var results = getResults(scrapingResults);
@@ -103,7 +109,7 @@ public class ProductsService {
 
         var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
                 .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
-                        e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), productsScrapingExecutor))
+                        e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), taskExecutor))
                 .toArray(CompletableFuture[]::new);
 
         var results = getResults(scrapingResults);

@@ -12,8 +12,8 @@ public class ApplicationConfig {
 
     @Bean
     @ConditionalOnProperty(name = "price-aggregator-api.products.scrapping.concurrent", havingValue = "true", matchIfMissing = true)
-    public ExecutorService productsScrapingExecutor() {
-        return Executors.newCachedThreadPool();
+    public ExecutorService taskExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 
     @Bean
