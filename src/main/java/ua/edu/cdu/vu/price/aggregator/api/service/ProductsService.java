@@ -11,7 +11,6 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.ProductsResponseMapper;
-import ua.edu.cdu.vu.price.aggregator.api.mapper.SelectorConfigMapper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +43,6 @@ public class ProductsService {
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
     private final ProductsResponseMapper productsResponseMapper;
-    private final SelectorConfigMapper selectorConfigMapper;
 
     public ProductsResponse search(String query) {
         var futures = marketplaceConfigDao.getAllMarketplaces().stream()
@@ -63,20 +61,11 @@ public class ProductsService {
 
     private ProductsResponse search(MarketplaceConfig marketplaceConfig, String query) {
 
-        SelectorConfig linkSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::linkSelector);
-        SelectorConfig imageSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::imageSelector);
-        SelectorConfig priceSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::priceSelector);
-        SelectorConfig descriptionSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.search(), SearchSelectorConfig::descriptionSelector);
+        SearchSelectorConfig selectorConfig = marketplaceConfig.search();
 
         Map<String, Object> arguments = Map.of(QUERY, query);
 
-        var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
-                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, arguments), taskExecutor))
-                .toArray(CompletableFuture[]::new);
-
-        var results = getResults(scrapingResults);
-
-        return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3));
+        return scrapeProducts(marketplaceConfig, selectorConfig, arguments);
     }
 
     private static ProductsResponse merge(ProductsResponse response1, ProductsResponse response2) {
@@ -86,14 +75,20 @@ public class ProductsService {
                 .build();
     }
 
+    @SuppressWarnings("unchecked")
+    private ProductsResponse scrapeProducts(MarketplaceConfig marketplaceConfig,
+                                            SearchSelectorConfig selectorConfig,
+                                            Map<String, Object> arguments) {
+        DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig, arguments,
+                selectorConfig.linkSelector(), selectorConfig.imageSelector(), selectorConfig.priceSelector(), selectorConfig.descriptionSelector());
+        var results = dslEvaluationService.evaluate(request).getValues();
+
+        return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3));
+    }
+
     public ProductsResponse getProducts(String marketplace, String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
-
-        SelectorConfig linkSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::linkSelector);
-        SelectorConfig imageSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::imageSelector);
-        SelectorConfig priceSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::priceSelector);
-        SelectorConfig descriptionSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::descriptionSelector);
-        SelectorConfig pagesCountSelectorConfig = selectorConfigMapper.convertToSelectorConfig(marketplaceConfig.products(), ProductsSelectorConfig.SelectorConfig::pagesCountSelector);
+        ProductsSelectorConfig selectorConfig = marketplaceConfig.products();
 
         List<Map.Entry<String, String>> filters = extractFilters(productsRequest, subcategory2);
 
@@ -101,32 +96,11 @@ public class ProductsService {
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);
         var allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
-        String pagesCountText = scrapeProducts(marketplaceConfig, pagesCountSelectorConfig, filters, arguments,
-                e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2));
-        int pagesCount = Optional.ofNullable(pagesCountText)
-                .map(Integer::parseInt)
-                .orElse(FIRST_PAGE);
-
-        var scrapingResults = Stream.of(linkSelectorConfig, imageSelectorConfig, priceSelectorConfig, descriptionSelectorConfig)
-                .map(selectorConfig -> CompletableFuture.supplyAsync(() -> scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments,
-                        e -> new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2)), taskExecutor))
-                .toArray(CompletableFuture[]::new);
-
-        var results = getResults(scrapingResults);
-
-        return productsResponseMapper.convertToResponse(results.get(0), results.get(1), results.get(2), results.get(3), pagesCount);
+        return scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments, e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2),
+                selectorConfig.self().linkSelector(), selectorConfig.self().imageSelector(), selectorConfig.self().priceSelector(), selectorConfig.self().descriptionSelector(), selectorConfig.self().pagesCountSelector());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<List<String>> getResults(CompletableFuture<?>[] scrapingResults) {
-        CompletableFuture.allOf(scrapingResults).join();
-        return Arrays.stream(scrapingResults)
-                .map(CompletableFuture::join)
-                .map(result -> (List<String>) result)
-                .toList();
-    }
-
-    private Map<String, Object> createArgumentsMap(String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
+    private static Map<String, Object> createArgumentsMap(String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
         return new HashMap<>() {{
             put(CATEGORY, category);
             put(SUBCATEGORY_1, subcategory1);
@@ -137,27 +111,29 @@ public class ProductsService {
         }};
     }
 
-    private <T> T scrapeProducts(MarketplaceConfig marketplaceConfig,
-                                 SelectorConfig selectorConfig,
-                                 Map<String, Object> arguments) {
-        return scrapeProducts(marketplaceConfig, selectorConfig, Collections.emptyList(), arguments, e -> e);
-    }
-
-    private <T> T scrapeProducts(MarketplaceConfig marketplaceConfig,
-                                 SelectorConfig selectorConfig,
-                                 List<Map.Entry<String, String>> filters,
-                                 Map<String, Object> arguments,
-                                 Function<DslExecutionException, RuntimeException> exceptionMapper) {
-        DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig);
+    @SuppressWarnings("unchecked")
+    private ProductsResponse scrapeProducts(MarketplaceConfig marketplaceConfig,
+                                            ProductsSelectorConfig selectorConfig,
+                                            List<Map.Entry<String, String>> filters,
+                                            Map<String, Object> arguments,
+                                            Function<DslExecutionException, RuntimeException> exceptionMapper,
+                                            String... selectors) {
+        DslEvaluationRequest rawRequest = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig, arguments, selectors);
         DslEvaluationRequest request = enrichRequestWithFilterActions(rawRequest, marketplaceConfig.products().filters(), filters.size());
+
         try {
-            return dslEvaluationService.<T>evaluate(request.withArguments(arguments)).getValue();
+            List<Object> results = dslEvaluationService.evaluate(request).getValues();
+            int pagesCount = Optional.ofNullable((String) results.get(4))
+                    .map(Integer::parseInt)
+                    .orElse(FIRST_PAGE);
+
+            return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3), pagesCount);
         } catch (DslExecutionException e) {
             throw exceptionMapper.apply(e);
         }
     }
 
-    private List<Map.Entry<String, String>> extractFilters(ProductsRequest request, String subcategory2) {
+    private static List<Map.Entry<String, String>> extractFilters(ProductsRequest request, String subcategory2) {
         return Stream.ofNullable(request.getFilters())
                 .flatMap(List::stream)
                 .flatMap(filter -> filter.getValues().stream()
@@ -167,11 +143,7 @@ public class ProductsService {
                 .toList();
     }
 
-    private DslEvaluationRequest enrichRequestWithFilterActions(DslEvaluationRequest request, TemplateConfig templateConfig, int filtersCount) {
-        if (filtersCount == 0) {
-            return request;
-        }
-
+    private static DslEvaluationRequest enrichRequestWithFilterActions(DslEvaluationRequest request, TemplateConfig templateConfig, int filtersCount) {
         var dynamicActions = IntStream.range(0, filtersCount)
                 .mapToObj(index -> templateConfig.template().formatted(index, index));
         var actions = Stream.of(
@@ -184,7 +156,7 @@ public class ProductsService {
         return request.withActions(actions);
     }
 
-    private Map<String, Object> enrichArguments(Map<String, Object> initialArguments, List<Map.Entry<String, String>> filters, String template, Function<Map.Entry<String, String>, String> filterExtractor) {
+    private static Map<String, Object> enrichArguments(Map<String, Object> initialArguments, List<Map.Entry<String, String>> filters, String template, Function<Map.Entry<String, String>, String> filterExtractor) {
         return IntStream.range(0, filters.size())
                 .boxed()
                 .collect(Collectors.toMap(template::formatted, i -> filterExtractor.apply(filters.get(i)), (v1, v2) -> v2, () -> initialArguments));

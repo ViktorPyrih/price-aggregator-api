@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.cache.ActionsUrlCacheManager;
 import ua.edu.cdu.vu.price.aggregator.api.domain.DslEvaluationScenario;
-import ua.edu.cdu.vu.price.aggregator.api.domain.DslExpression;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationResponse;
 import ua.edu.cdu.vu.price.aggregator.api.parser.DslExpressionParser;
@@ -32,28 +31,30 @@ public class DslEvaluationService {
     @Value("${price-aggregator-api.selenide.http.proxy:}")
     private String proxy;
 
-    public <T> DslEvaluationResponse<T> evaluate(DslEvaluationRequest request) {
+    public DslEvaluationResponse evaluate(DslEvaluationRequest request) {
         String url = request.getTarget().url();
         var actions = Stream.ofNullable(request.getActions())
                 .flatMap(Collection::stream)
                 .map(dslExpressionParser::parse)
                 .toList();
-        DslExpression<T> expression = dslExpressionParser.parse(request.getExpression(), request.getOtherExpressions());
+        var expressions = request.getExpressions().stream()
+                .map(expression -> dslExpressionParser.parse(expression, request.getOtherExpressions()))
+                .toList();
         Map<String, Object> arguments = new HashMap<>(request.getArguments()) {{
             if (!proxy.isBlank()) {
                 put(PROXY, proxy);
             }
         }};
 
-        try (var scenario = DslEvaluationScenario.<T>builder()
+        try (var scenario = DslEvaluationScenario.builder()
                 .actions(actions)
-                .expression(expression)
+                .expressions(expressions)
                 .debug(debug)
                 .webDriver(webDriver)
                 .cacheManager(cacheManager)
                 .build()) {
-            return DslEvaluationResponse.<T>builder()
-                    .value(scenario.run(url, arguments))
+            return DslEvaluationResponse.builder()
+                    .values(scenario.run(url, arguments))
                     .build();
         }
     }

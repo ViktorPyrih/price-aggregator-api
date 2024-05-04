@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Value
 @Builder
-public class DslEvaluationScenario<T> implements AutoCloseable {
+public class DslEvaluationScenario implements AutoCloseable {
 
     private static final int NO_CACHE_HIT_INDEX = -1;
 
@@ -26,14 +26,14 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
 
     List<DslExpression<Object>> actions;
     @NonNull
-    DslExpression<T> expression;
+    List<DslExpression<Object>> expressions;
     boolean debug;
     @NonNull
     WebDriver webDriver;
     @NonNull
     ActionsUrlCacheManager cacheManager;
 
-    public T run(String url, Map<String, Object> context) {
+    public List<Object> run(String url, Map<String, Object> context) {
         log.debug("DSL evaluation scenario started with url: {} and context: {}", url, context);
 
         if (!CollectionUtils.isEmpty(actions)) {
@@ -51,9 +51,9 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
             }
         }
 
-        log.debug("About to execute main expression: {}", expression);
-        T result = expression.evaluate(url, context, webDriver);
-        log.debug("Main expression: {} executed successfully", expression);
+        log.debug("About to execute selector expressions: {}", expressions);
+        List<Object> result = evaluateExpressions(url, context);
+        log.debug("Selector expressions: {} executed successfully", expressions);
 
         return result;
     }
@@ -66,6 +66,12 @@ public class DslEvaluationScenario<T> implements AutoCloseable {
         }
         webDriver.close();
         log.debug("Web driver closed");
+    }
+
+    private List<Object> evaluateExpressions(String url, Map<String, Object> context) {
+        return expressions.stream()
+                .map(expression -> expression.evaluate(url, context, webDriver))
+                .toList();
     }
 
     private void evaluateActions(String url, Map<String, Object> context, int index) {

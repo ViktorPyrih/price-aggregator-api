@@ -12,7 +12,6 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -42,16 +41,16 @@ public class CategoriesService {
         return getCategories(marketplace, MarketplaceConfig::subcategories2, Map.of(CATEGORY, category, SUBCATEGORY, subcategory));
     }
 
-    private CategoriesResponse getCategories(String marketplace, Function<MarketplaceConfig, SelectorConfig> selectorConfigFunction, Map<String, String> arguments) {
+    private CategoriesResponse getCategories(String marketplace, Function<MarketplaceConfig, SelectorConfig> selectorConfigFunction, Map<String, Object> arguments) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfigFunction.apply(marketplaceConfig), arguments);
 
         try {
             return CategoriesResponse.builder()
-                    .categories(dslEvaluationService.<List<String>>evaluate(request).getValue())
+                    .categories(dslEvaluationService.evaluate(request).getSingleValue())
                     .build();
         } catch (DslExecutionException e) {
-            throw new CategoriesNotFoundException(marketplace, e, arguments.values());
+            throw new CategoriesNotFoundException(marketplace, e, arguments.values().stream().map(Object::toString).toArray(String[]::new));
         }
     }
 }

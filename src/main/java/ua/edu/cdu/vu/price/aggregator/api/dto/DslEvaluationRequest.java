@@ -2,6 +2,7 @@ package ua.edu.cdu.vu.price.aggregator.api.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Value;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class DslEvaluationRequest {
 
     @Valid @NotNull Target target;
-    @NotBlank String expression;
+    @NotEmpty List<String> expressions;
     List<@NotBlank String> actions;
     List<@NotBlank String> otherExpressions;
     Map<@NotBlank String, @NotNull Object> arguments;
