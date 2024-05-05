@@ -20,26 +20,23 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FiltersService {
 
-    private static final String CATEGORY = "category";
-    private static final String SUBCATEGORY_1 = "subcategory1";
-    private static final String SUBCATEGORY_2 = "subcategory2";
-
     private final MarketplaceConfigDao marketplaceConfigDao;
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
     private final FilterResponseMapper filterResponseMapper;
+    private final SubcategoriesService subcategoriesService;
 
     @Cacheable("filters")
-    public FiltersResponse getFilters(String marketplace, String category, String subcategory1, String subcategory2) {
+    public FiltersResponse getFilters(String marketplace, String category, Map<String, String> subcategories) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
-        Map<String, Object> arguments = Map.of(CATEGORY, category, SUBCATEGORY_1, subcategory1, SUBCATEGORY_2, subcategory2);
+        Map<String, Object> arguments = subcategoriesService.getSubcategoriesMap(marketplace, category, subcategories);
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), marketplaceConfig.filters(), arguments);
 
         try {
             List<Pair<String, List<String>>> rawFilters = dslEvaluationService.evaluate(request).getSingleValue();
             return filterResponseMapper.convertToResponse(rawFilters);
         } catch (DslExecutionException e) {
-            throw new CategoriesNotFoundException(marketplace, e, category, subcategory1, subcategory2);
+            throw new CategoriesNotFoundException(marketplace, category, subcategories.values(), e);
         }
     }
 }

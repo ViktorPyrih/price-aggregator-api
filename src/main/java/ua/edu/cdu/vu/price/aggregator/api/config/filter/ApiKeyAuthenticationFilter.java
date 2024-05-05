@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "price-aggregator-api.authentication.enabled", havingValue = "true", matchIfMissing = true)
 public class ApiKeyAuthenticationFilter implements Filter {
 
     public static final String API_KEY_HEADER_NAME = "x-api-key";

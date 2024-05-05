@@ -12,6 +12,8 @@ import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -19,12 +21,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class CategoriesService {
 
-    private static final String CATEGORY = "category";
-    private static final String SUBCATEGORY = "subcategory";
-
     private final MarketplaceConfigDao marketplaceConfigDao;
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
+    private final SubcategoriesService subcategoriesService;
 
     @Cacheable("categories")
     public CategoriesResponse getCategories(String marketplace) {
@@ -32,13 +32,14 @@ public class CategoriesService {
     }
 
     @Cacheable("subcategories")
-    public CategoriesResponse getCategories(String marketplace, String category) {
-        return getCategories(marketplace, MarketplaceConfig::subcategories1, Map.of(CATEGORY, category));
-    }
+    public CategoriesResponse getSubcategories(String marketplace, String category, Map<String, String> subcategories) {
+        MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
 
-    @Cacheable("subcategories2")
-    public CategoriesResponse getCategories(String marketplace, String category, String subcategory) {
-        return getCategories(marketplace, MarketplaceConfig::subcategories2, Map.of(CATEGORY, category, SUBCATEGORY, subcategory));
+        Map<String, Object> arguments = subcategoriesService.getSubcategoriesMap(marketplace, category, subcategories);
+
+        var subcategoriesConfig = marketplaceConfig.subcategories();
+
+        return getCategories(marketplace, config -> subcategoriesConfig.get(arguments.size() - 1), arguments);
     }
 
     private CategoriesResponse getCategories(String marketplace, Function<MarketplaceConfig, SelectorConfig> selectorConfigFunction, Map<String, Object> arguments) {
@@ -50,7 +51,14 @@ public class CategoriesService {
                     .categories(dslEvaluationService.evaluate(request).getSingleValue())
                     .build();
         } catch (DslExecutionException e) {
-            throw new CategoriesNotFoundException(marketplace, e, arguments.values().stream().map(Object::toString).toArray(String[]::new));
+
+            throw new CategoriesNotFoundException(marketplace, convertToStringList(arguments.values()), e);
         }
+    }
+
+    private static List<String> convertToStringList(Collection<Object> objects) {
+        return objects.stream()
+                .map(Object::toString)
+                .toList();
     }
 }

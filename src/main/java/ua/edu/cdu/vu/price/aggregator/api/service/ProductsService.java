@@ -1,6 +1,7 @@
 package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
 import ua.edu.cdu.vu.price.aggregator.api.domain.*;
@@ -21,6 +22,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static ua.edu.cdu.vu.price.aggregator.api.util.CommonConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +31,6 @@ public class ProductsService {
     private static final int FIRST_PAGE = 1;
     private static final String KEY_TEMPLATE = "key_%d";
     private static final String VALUE_TEMPLATE = "value_%d";
-
-    private static final String CATEGORY = "category";
-    private static final String SUBCATEGORY_1 = "subcategory1";
-    private static final String SUBCATEGORY_2 = "subcategory2";
-    private static final String MIN_PRICE = "minPrice";
-    private static final String MAX_PRICE = "maxPrice";
-    private static final String PAGE = "page";
-    private static final String QUERY = "query";
 
     private final ExecutorService taskExecutor;
     private final MarketplaceConfigDao marketplaceConfigDao;
@@ -86,29 +80,28 @@ public class ProductsService {
         return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3));
     }
 
-    public ProductsResponse getProducts(String marketplace, String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
+    public ProductsResponse getProducts(String marketplace, String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         ProductsSelectorConfig selectorConfig = marketplaceConfig.products();
 
-        List<Map.Entry<String, String>> filters = extractFilters(productsRequest, subcategory2);
+        List<Map.Entry<String, String>> filters = extractFilters(productsRequest, extractLastSubcategory(subcategories));
 
-        var arguments = createArgumentsMap(category, subcategory1, subcategory2, productsRequest, page);
+        var arguments = createArgumentsMap(category, subcategories, productsRequest, page);
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);
-        var allArguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
+        arguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
-        return scrapeProducts(marketplaceConfig, selectorConfig, filters, allArguments, e -> new CategoriesNotFoundException(marketplace, page, e, category, subcategory1, subcategory2),
+        return scrapeProducts(marketplaceConfig, selectorConfig, filters, arguments, e -> new CategoriesNotFoundException(marketplace, page, category, subcategories.values(), e),
                 selectorConfig.self().linkSelector(), selectorConfig.self().imageSelector(), selectorConfig.self().priceSelector(), selectorConfig.self().descriptionSelector(), selectorConfig.self().pagesCountSelector());
     }
 
-    private static Map<String, Object> createArgumentsMap(String category, String subcategory1, String subcategory2, ProductsRequest productsRequest, int page) {
-        return new HashMap<>() {{
-            put(CATEGORY, category);
-            put(SUBCATEGORY_1, subcategory1);
-            put(SUBCATEGORY_2, subcategory2);
-            put(MIN_PRICE, productsRequest.getMinPrice());
-            put(MAX_PRICE, productsRequest.getMaxPrice());
-            put(PAGE, page);
-        }};
+    private static Map<String, Object> createArgumentsMap(String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
+        HashMap<String, Object> arguments = new HashMap<>(subcategories);
+        arguments.put(CATEGORY, category);
+        arguments.put(MIN_PRICE, productsRequest.getMinPrice());
+        arguments.put(MAX_PRICE, productsRequest.getMaxPrice());
+        arguments.put(PAGE, page);
+
+        return arguments;
     }
 
     @SuppressWarnings("unchecked")
@@ -131,6 +124,14 @@ public class ProductsService {
         } catch (DslExecutionException e) {
             throw exceptionMapper.apply(e);
         }
+    }
+
+    private static String extractLastSubcategory(Map<String, String> subcategories) {
+        return subcategories.entrySet().stream()
+                .map(entry -> Map.entry(Integer.parseInt(StringUtils.substringAfter(entry.getKey(), SUBCATEGORY)), entry.getValue()))
+                .max(Comparator.comparingInt(Map.Entry::getKey))
+                .map(Map.Entry::getValue)
+                .orElseThrow();
     }
 
     private static List<Map.Entry<String, String>> extractFilters(ProductsRequest request, String subcategory2) {

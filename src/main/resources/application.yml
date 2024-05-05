@@ -16,6 +16,9 @@ spring:
       host: localhost
       port: 6379
 price-aggregator-api:
+  config:
+    subcategories:
+      max-count: 2
   selenide:
     headless: true
     timeout: 4000

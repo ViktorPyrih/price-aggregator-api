@@ -9,6 +9,15 @@ import java.util.List;
 @Builder
 public class MarketplacesResponse {
 
-    List<String> marketplaces;
+    List<Marketplace> marketplaces;
+
+    @Value
+    @Builder
+    public static class Marketplace {
+
+        String name;
+        Integer subcategoriesCount;
+
+    }
 
 }

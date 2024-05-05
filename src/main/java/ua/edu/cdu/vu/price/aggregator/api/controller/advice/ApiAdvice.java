@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
+import ua.edu.cdu.vu.price.aggregator.api.validation.HttpRequestNotValidException;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,7 +45,7 @@ public class ApiAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UnsupportedOperationException.class)
+    @ExceptionHandler({UnsupportedOperationException.class, HttpRequestNotValidException.class})
     public ProblemDetail handleUnsupportedOperationExceptions(UnsupportedOperationException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }

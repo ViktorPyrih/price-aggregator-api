@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -24,8 +25,7 @@ public class MarketplaceConfigProperties {
 
     public record Part(@NotBlank String url,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig categories,
-                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories1,
-                       @NotNull @Valid MarketplaceConfigProperties.SelectorConfig subcategories2,
+                       @NotEmpty @Size(max = 2) List<MarketplaceConfigProperties.@Valid SelectorConfig> subcategories,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig filters,
                        @NotNull @Valid MarketplaceConfigProperties.ProductsSelectorConfig products,
                        @Valid MarketplaceConfigProperties.SearchSelectorConfig search) {

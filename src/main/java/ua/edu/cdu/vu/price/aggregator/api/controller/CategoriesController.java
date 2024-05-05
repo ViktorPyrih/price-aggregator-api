@@ -1,35 +1,34 @@
 package ua.edu.cdu.vu.price.aggregator.api.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.edu.cdu.vu.price.aggregator.api.dto.CategoriesResponse;
 import ua.edu.cdu.vu.price.aggregator.api.service.CategoriesService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
+import ua.edu.cdu.vu.price.aggregator.api.util.RequestUtils;
+import ua.edu.cdu.vu.price.aggregator.api.validation.subcategories.SubcategoriesCountRequestValidator;
 
 @RestController
 @ApiKeySecuritySchema
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/marketplaces/{marketplace}/categories")
+@RequestMapping("/api/v1/marketplaces/{marketplace}")
 public class CategoriesController {
 
     private final CategoriesService categoriesService;
+    private final SubcategoriesCountRequestValidator subcategoriesCountRequestValidator;
 
     @ApiKeyRequired
-    @GetMapping
+    @GetMapping("/categories")
     public CategoriesResponse getCategories(@PathVariable String marketplace) {
         return categoriesService.getCategories(marketplace);
     }
 
     @ApiKeyRequired
-    @GetMapping(params = "category")
-    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @RequestParam String category) {
-        return categoriesService.getCategories(marketplace, category);
-    }
-
-    @ApiKeyRequired
-    @GetMapping(params = {"category", "subcategory"})
-    public CategoriesResponse getSubcategories(@PathVariable String marketplace, @RequestParam String category, @RequestParam String subcategory) {
-        return categoriesService.getCategories(marketplace, category, subcategory);
+    @GetMapping("/subcategories")
+    public CategoriesResponse getSubcategories(HttpServletRequest request, @PathVariable String marketplace, @RequestParam String category) {
+        subcategoriesCountRequestValidator.validate(request);
+        return categoriesService.getSubcategories(marketplace, category, RequestUtils.extractSubcategories(request));
     }
 }

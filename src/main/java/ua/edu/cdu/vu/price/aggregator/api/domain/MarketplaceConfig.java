@@ -1,9 +1,10 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain;
 
+import java.util.List;
+
 public record MarketplaceConfig(String url,
                                 SelectorConfig categories,
-                                SelectorConfig subcategories1,
-                                SelectorConfig subcategories2,
+                                List<SelectorConfig> subcategories,
                                 SelectorConfig filters,
                                 ProductsSelectorConfig products,
                                 SearchSelectorConfig search) {
