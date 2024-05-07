@@ -14,7 +14,7 @@ public class FileUtils {
     @SuppressWarnings("all")
     public static String encodeAsBase64(File file) {
         try {
-            return new String(Base64.getEncoder().encode(new FileInputStream(file).readAllBytes()));
+            return Base64.getEncoder().encodeToString(new FileInputStream(file).readAllBytes());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -7,6 +7,7 @@ public record SearchSelectorConfig(List<String> actions,
                                    String linkSelector,
                                    String priceSelector,
                                    String descriptionSelector,
+                                   String titleSelector,
                                    String pagesCountSelector,
                                    List<String> other) {
 }

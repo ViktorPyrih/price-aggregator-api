@@ -17,6 +17,13 @@ import static java.util.Objects.requireNonNull;
 @EqualsAndHashCode(callSuper = true)
 public class ScreenshotDslCommand extends DslCommand<Object, Object> {
 
+    private static final String SCROLL_OPTIONS = """
+            {
+                block: "center",
+                inline: "center"
+            }
+    """;
+
     public static final ScreenshotDslCommand INSTANCE = new ScreenshotDslCommand();
 
     @Override
@@ -35,7 +42,7 @@ public class ScreenshotDslCommand extends DslCommand<Object, Object> {
     }
 
     private FileSystemResource screenshot(SelenideElement element) {
-        element.scrollIntoView(true);
+        element.scrollIntoView(SCROLL_OPTIONS);
         return new FileSystemResource(requireNonNull(element.screenshot()));
     }
 }

@@ -17,6 +17,7 @@ public class ProductsResponse implements Serializable {
     @Value
     @Builder
     public static class Product implements Serializable {
+        String title;
         String link;
         String image;
         String price;

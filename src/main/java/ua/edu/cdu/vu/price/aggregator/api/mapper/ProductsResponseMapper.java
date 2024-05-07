@@ -16,8 +16,9 @@ public interface ProductsResponseMapper {
                                                List<String> productImages,
                                                List<String> productPrices,
                                                List<String> productDescriptions,
+                                               List<String> productTitles,
                                                int pagesCount) {
-        int productsCount = min(productLinks.size(), productImages.size(), productPrices.size(), productDescriptions.size());
+        int productsCount = min(productLinks.size(), productImages.size(), productPrices.size(), productDescriptions.size(), productTitles.size());
 
         return ProductsResponse.builder()
                 .products(IntStream.range(0, productsCount)
@@ -26,6 +27,7 @@ public interface ProductsResponseMapper {
                                 .image(productImages.get(i))
                                 .price(productPrices.get(i))
                                 .description(productDescriptions.get(i))
+                                .title(productTitles.get(i))
                                 .build())
                         .toList())
                 .pagesCount(pagesCount)
@@ -35,8 +37,9 @@ public interface ProductsResponseMapper {
     default ProductsResponse convertToResponse(List<String> productLinks,
                                                List<String> productImages,
                                                List<String> productPrices,
-                                               List<String> productDescriptions) {
-        return convertToResponse(productLinks, productImages, productPrices, productDescriptions, 1);
+                                               List<String> productDescriptions,
+                                               List<String> productTitles) {
+        return convertToResponse(productLinks, productImages, productPrices, productDescriptions, productTitles, 1);
     }
 
     private static int min(int... numbers) {

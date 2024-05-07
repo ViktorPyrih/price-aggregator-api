@@ -54,9 +54,9 @@ public class DslExpression<T> implements Serializable {
             if (shouldRetry(e) && attempts > 0) {
                 log.error("Error occurred. Retrying DSL expression evaluation. Attempt: {}", attempts, e);
                 return evaluate(url, context, webDriver, attempts - 1);
-            } else {
-                throw e;
             }
+
+            throw e;
         }
     }
 

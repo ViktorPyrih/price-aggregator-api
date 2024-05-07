@@ -9,6 +9,7 @@ public record ProductsSelectorConfig(TemplateConfig filters, SelectorConfig self
                                  String linkSelector,
                                  String priceSelector,
                                  String descriptionSelector,
+                                 String titleSelector,
                                  String pagesCountSelector,
                                  List<String> other) {
     }

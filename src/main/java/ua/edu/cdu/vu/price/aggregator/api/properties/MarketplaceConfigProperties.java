@@ -21,7 +21,7 @@ import java.util.Optional;
 public class MarketplaceConfigProperties {
 
     @NotEmpty
-    Map<@NotBlank String, @Valid Part> marketplaceConfig;
+    Map<@NotBlank @Size(max = 10) String, @Valid Part> marketplaceConfig;
 
     public record Part(@NotBlank String url,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig categories,
@@ -44,6 +44,7 @@ public class MarketplaceConfigProperties {
                                      @NotBlank String linkSelector,
                                      @NotBlank String priceSelector,
                                      @NotBlank String descriptionSelector,
+                                     @NotBlank String titleSelector,
                                      @NotBlank String pagesCountSelector,
                                      List<@NotBlank String> other) {
         }
@@ -54,6 +55,7 @@ public class MarketplaceConfigProperties {
                                        @NotBlank String linkSelector,
                                        @NotBlank String priceSelector,
                                        @NotBlank String descriptionSelector,
+                                       @NotBlank String titleSelector,
                                        @NotBlank String pagesCountSelector,
                                        List<@NotBlank String> other) {
     }

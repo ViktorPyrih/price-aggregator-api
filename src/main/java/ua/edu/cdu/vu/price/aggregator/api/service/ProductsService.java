@@ -53,6 +53,11 @@ public class ProductsService {
                 .reduce(ProductsResponse.empty(), ProductsService::merge);
     }
 
+    public ProductsResponse search(String marketplace, String query) {
+        MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
+        return search(marketplaceConfig, query);
+    }
+
     private ProductsResponse search(MarketplaceConfig marketplaceConfig, String query) {
 
         SearchSelectorConfig selectorConfig = marketplaceConfig.search();
@@ -74,10 +79,10 @@ public class ProductsService {
                                             SearchSelectorConfig selectorConfig,
                                             Map<String, Object> arguments) {
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig, arguments,
-                selectorConfig.linkSelector(), selectorConfig.imageSelector(), selectorConfig.priceSelector(), selectorConfig.descriptionSelector());
+                selectorConfig.linkSelector(), selectorConfig.imageSelector(), selectorConfig.priceSelector(), selectorConfig.descriptionSelector(), selectorConfig.titleSelector());
         var results = dslEvaluationService.evaluate(request).getValues();
 
-        return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3));
+        return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4));
     }
 
     public ProductsResponse getProducts(String marketplace, String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
@@ -91,7 +96,7 @@ public class ProductsService {
         arguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
         return scrapeProducts(marketplaceConfig, selectorConfig, filters, arguments, e -> new CategoriesNotFoundException(marketplace, page, category, subcategories.values(), e),
-                selectorConfig.self().linkSelector(), selectorConfig.self().imageSelector(), selectorConfig.self().priceSelector(), selectorConfig.self().descriptionSelector(), selectorConfig.self().pagesCountSelector());
+                selectorConfig.self().linkSelector(), selectorConfig.self().imageSelector(), selectorConfig.self().priceSelector(), selectorConfig.self().descriptionSelector(), selectorConfig.self().titleSelector(), selectorConfig.self().pagesCountSelector());
     }
 
     private static Map<String, Object> createArgumentsMap(String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
@@ -116,11 +121,11 @@ public class ProductsService {
 
         try {
             List<Object> results = dslEvaluationService.evaluate(request).getValues();
-            int pagesCount = Optional.ofNullable((String) results.get(4))
+            int pagesCount = Optional.ofNullable((String) results.get(5))
                     .map(Integer::parseInt)
                     .orElse(FIRST_PAGE);
 
-            return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3), pagesCount);
+            return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4), pagesCount);
         } catch (DslExecutionException e) {
             throw exceptionMapper.apply(e);
         }
@@ -150,7 +155,7 @@ public class ProductsService {
         var actions = Stream.of(
                         request.getActions().subList(0, request.getActions().size() - 2).stream(),
                         dynamicActions,
-                        request.getActions().subList(request.getActions().size() - 3, request.getActions().size()).stream())
+                        request.getActions().subList(request.getActions().size() - 2, request.getActions().size()).stream())
                 .flatMap(Function.identity())
                 .toList();
 
