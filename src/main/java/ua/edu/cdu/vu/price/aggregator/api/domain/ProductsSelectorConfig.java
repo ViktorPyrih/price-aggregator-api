@@ -7,9 +7,10 @@ public record ProductsSelectorConfig(TemplateConfig filters, SelectorConfig self
     public record SelectorConfig(List<String> actions,
                                  String imageSelector,
                                  String linkSelector,
-                                 String priceSelector,
-                                 String descriptionSelector,
+                                 String priceImgSelector,
+                                 String descriptionImgSelector,
                                  String titleSelector,
+                                 String priceSelector,
                                  String pagesCountSelector,
                                  List<String> other) {
     }

@@ -79,10 +79,11 @@ public class ProductsService {
                                             SearchSelectorConfig selectorConfig,
                                             Map<String, Object> arguments) {
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), selectorConfig, arguments,
-                selectorConfig.linkSelector(), selectorConfig.imageSelector(), selectorConfig.priceSelector(), selectorConfig.descriptionSelector(), selectorConfig.titleSelector());
+                selectorConfig.linkSelector(), selectorConfig.imageSelector(), selectorConfig.priceImgSelector(), selectorConfig.descriptionImgSelector(), selectorConfig.titleSelector(), selectorConfig.priceSelector());
         var results = dslEvaluationService.evaluate(request).getValues();
 
-        return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4));
+        return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1),
+                (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4), (List<String>) results.get(5));
     }
 
     public ProductsResponse getProducts(String marketplace, String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
@@ -96,7 +97,9 @@ public class ProductsService {
         arguments = enrichArguments(arguments, filters, VALUE_TEMPLATE, Map.Entry::getValue);
 
         return scrapeProducts(marketplaceConfig, selectorConfig, filters, arguments, e -> new CategoriesNotFoundException(marketplace, page, category, subcategories.values(), e),
-                selectorConfig.self().linkSelector(), selectorConfig.self().imageSelector(), selectorConfig.self().priceSelector(), selectorConfig.self().descriptionSelector(), selectorConfig.self().titleSelector(), selectorConfig.self().pagesCountSelector());
+                selectorConfig.self().linkSelector(), selectorConfig.self().imageSelector(), selectorConfig.self().priceImgSelector(), selectorConfig.self().descriptionImgSelector(),
+                selectorConfig.self().titleSelector(), selectorConfig.self().priceSelector(), selectorConfig.self().pagesCountSelector()
+        );
     }
 
     private static Map<String, Object> createArgumentsMap(String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
@@ -121,11 +124,12 @@ public class ProductsService {
 
         try {
             List<Object> results = dslEvaluationService.evaluate(request).getValues();
-            int pagesCount = Optional.ofNullable((String) results.get(5))
+            int pagesCount = Optional.ofNullable((String) results.get(6))
                     .map(Integer::parseInt)
                     .orElse(FIRST_PAGE);
 
-            return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1), (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4), pagesCount);
+            return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1),
+                    (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4), (List<String>) results.get(5), pagesCount);
         } catch (DslExecutionException e) {
             throw exceptionMapper.apply(e);
         }

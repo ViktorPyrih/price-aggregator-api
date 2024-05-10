@@ -21,7 +21,8 @@ public class ProductsResponse implements Serializable {
         String link;
         String image;
         String price;
-        String description;
+        String priceImage;
+        String descriptionImage;
     }
 
     public static ProductsResponse empty() {

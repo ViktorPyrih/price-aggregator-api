@@ -42,9 +42,10 @@ public class MarketplaceConfigProperties {
         public record SelectorConfig(List<@NotBlank String> actions,
                                      @NotBlank String imageSelector,
                                      @NotBlank String linkSelector,
-                                     @NotBlank String priceSelector,
-                                     @NotBlank String descriptionSelector,
+                                     @NotBlank String priceImgSelector,
+                                     @NotBlank String descriptionImgSelector,
                                      @NotBlank String titleSelector,
+                                     @NotBlank String priceSelector,
                                      @NotBlank String pagesCountSelector,
                                      List<@NotBlank String> other) {
         }
@@ -53,9 +54,10 @@ public class MarketplaceConfigProperties {
     public record SearchSelectorConfig(List<@NotBlank String> actions,
                                        @NotBlank String imageSelector,
                                        @NotBlank String linkSelector,
-                                       @NotBlank String priceSelector,
-                                       @NotBlank String descriptionSelector,
+                                       @NotBlank String priceImgSelector,
+                                       @NotBlank String descriptionImgSelector,
                                        @NotBlank String titleSelector,
+                                       @NotBlank String priceSelector,
                                        @NotBlank String pagesCountSelector,
                                        List<@NotBlank String> other) {
     }
