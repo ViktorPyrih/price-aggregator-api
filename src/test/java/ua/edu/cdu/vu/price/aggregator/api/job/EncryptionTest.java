@@ -1,4 +1,4 @@
-package ua.edu.cdu.vu.price.aggregator.api.encryption;
+package ua.edu.cdu.vu.price.aggregator.api.job;
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.iv.RandomIvGenerator;

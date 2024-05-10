@@ -12,6 +12,7 @@ import ua.edu.cdu.vu.price.aggregator.api.job.client.PriceAggregatorClient;
 import ua.edu.cdu.vu.price.aggregator.api.job.client.PriceAggregatorRestClient;
 import ua.edu.cdu.vu.price.aggregator.api.job.decorator.PriceAggregatorClientBulkhead;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -19,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CacheEnricherTest {
+
+    private static final Set<String> SUBCATEGORIES_TO_IGNORE = Set.of("Всі бренди");
 
     @Autowired
     private TestRestTemplate rest;
@@ -38,36 +41,41 @@ public class CacheEnricherTest {
 
     @Test
     @Disabled
-    void populateHotlineCategoriesCacheConcurrently() {
+    void populateHotlineCacheConcurrently() {
         final String marketplace = "hotline";
         populateCategoriesCacheConcurrently(marketplace);
     }
 
     @Test
     @Disabled
-    void populateEkatalogCategoriesCacheConcurrently() {
+    void populateEkatalogCacheConcurrently() {
         final String marketplace = "ekatalog";
         populateCategoriesCacheConcurrently(marketplace);
     }
 
     @Test
-    void populateHotlineCategoriesCache() {
+    void populateHotlineCache() {
         final String marketplace = "hotline";
-        populateCategoriesCache(marketplace);
+        populateCache(marketplace);
     }
 
     @Test
-    void populateEkatalogCategoriesCache() {
+    void populateEkatalogCache() {
         final String marketplace = "ekatalog";
-        populateCategoriesCache(marketplace);
+        populateCache(marketplace);
     }
 
-    void populateCategoriesCache(String marketplace) {
+    void populateCache(String marketplace) {
         var categories = priceAggregatorClient.getCategories(marketplace);
         for (var category : categories) {
             var subcategories = priceAggregatorClient.getSubcategories(marketplace, category);
             for (var subcategory : subcategories) {
-                priceAggregatorClient.getSubcategories(marketplace, category, subcategory);
+                var subcategories2 = priceAggregatorClient.getSubcategories(marketplace, category, subcategory);
+                for (var subcategory2 : subcategories2) {
+                    if (!SUBCATEGORIES_TO_IGNORE.contains(subcategory2)) {
+                        priceAggregatorClient.getFilters(marketplace, category, subcategory, subcategory2);
+                    }
+                }
             }
         }
     }
