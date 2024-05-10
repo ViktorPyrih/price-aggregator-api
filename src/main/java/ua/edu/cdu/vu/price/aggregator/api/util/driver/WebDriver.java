@@ -12,6 +12,9 @@ public interface WebDriver {
 
     int WINDOW_WIDTH = 4048;
     int WINDOW_HEIGHT = 4048;
+    String INITIAL_URL = "data:,";
+
+    void setDriver(org.openqa.selenium.WebDriver webDriver);
 
     void open(String url);
 
@@ -38,7 +41,7 @@ public interface WebDriver {
     }
 
     default boolean isStarted() {
-        return unwrap().hasWebDriverStarted();
+        return !INITIAL_URL.equals(unwrap().url());
     }
 
     default void resizeWindow() {

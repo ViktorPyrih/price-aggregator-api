@@ -9,10 +9,10 @@ import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationResponse;
 import ua.edu.cdu.vu.price.aggregator.api.parser.DslExpressionParser;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
+import ua.edu.cdu.vu.price.aggregator.api.util.pool.WebDriverPool;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
@@ -24,6 +24,7 @@ public class DslEvaluationService {
     private final DslExpressionParser dslExpressionParser;
     private final WebDriver webDriver;
     private final ActionsUrlCacheManager cacheManager;
+    private final WebDriverPool webDriverPool;
 
     @Value("${price-aggregator-api.dsl.evaluation.scenario.debug:false}")
     private boolean debug;
@@ -40,11 +41,10 @@ public class DslEvaluationService {
         var expressions = request.getExpressions().stream()
                 .map(expression -> dslExpressionParser.parse(expression, request.getOtherExpressions()))
                 .toList();
-        Map<String, Object> arguments = new HashMap<>(request.getArguments()) {{
-            if (!proxy.isBlank()) {
-                put(PROXY, proxy);
-            }
-        }};
+        var arguments = new HashMap<>(request.getArguments());
+        if (!proxy.isBlank()) {
+            arguments.put(PROXY, proxy);
+        }
 
         try (var scenario = DslEvaluationScenario.builder()
                 .actions(actions)
@@ -52,6 +52,7 @@ public class DslEvaluationService {
                 .debug(debug)
                 .webDriver(webDriver)
                 .cacheManager(cacheManager)
+                .webDriverPool(webDriverPool)
                 .build()) {
             return DslEvaluationResponse.builder()
                     .values(scenario.run(url, arguments))

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import ua.edu.cdu.vu.price.aggregator.api.cache.ActionsUrlCacheManager;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
+import ua.edu.cdu.vu.price.aggregator.api.util.pool.WebDriverPool;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,9 +33,13 @@ public class DslEvaluationScenario implements AutoCloseable {
     WebDriver webDriver;
     @NonNull
     ActionsUrlCacheManager cacheManager;
+    @NonNull
+    WebDriverPool webDriverPool;
 
     public List<Object> run(String url, Map<String, Object> context) {
         log.debug("DSL evaluation scenario started with url: {} and context: {}", url, context);
+        webDriver.setDriver(webDriverPool.getDriver());
+        log.debug("Web driver allocated to the current thread: {}", Thread.currentThread().threadId());
 
         if (!CollectionUtils.isEmpty(actions)) {
             var actionIndexAndUrlOptional = cacheManager.findUrlByActionsAndContext(actions, context);
@@ -65,7 +70,6 @@ public class DslEvaluationScenario implements AutoCloseable {
             sleep();
         }
         webDriver.close();
-        log.debug("Web driver closed");
     }
 
     private List<Object> evaluateExpressions(String url, Map<String, Object> context) {

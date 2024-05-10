@@ -9,9 +9,10 @@ import org.springframework.core.io.FileSystemResource;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
+import java.io.File;
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
@@ -43,6 +44,12 @@ public class ScreenshotDslCommand extends DslCommand<Object, Object> {
 
     private FileSystemResource screenshot(SelenideElement element) {
         element.scrollIntoView(SCROLL_OPTIONS);
-        return new FileSystemResource(requireNonNull(element.screenshot()));
+        File screenshot = element.screenshot();
+
+        if (isNull(screenshot)) {
+            throw new DslExecutionException("Unable to take a screenshot of element: %s".formatted(element));
+        }
+
+        return new FileSystemResource(screenshot);
     }
 }

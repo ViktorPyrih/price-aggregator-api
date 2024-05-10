@@ -4,10 +4,15 @@ import com.codeborne.selenide.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Proxy;
 
-import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.WebDriverRunner.driver;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 
 public class SelenideWebDriver implements WebDriver {
+
+    @Override
+    public void setDriver(org.openqa.selenium.WebDriver webDriver) {
+        WebDriverRunner.setWebDriver(webDriver);
+    }
 
     @Override
     public void open(String url) {
@@ -16,7 +21,10 @@ public class SelenideWebDriver implements WebDriver {
 
     @Override
     public void close() {
-        closeWebDriver();
+        // as a workaround to reuse web driver instances
+        open(INITIAL_URL);
+
+        Selenide.closeWebDriver();
     }
 
     @Override
@@ -36,6 +44,6 @@ public class SelenideWebDriver implements WebDriver {
 
     @Override
     public Driver unwrap() {
-        return driver();
+        return WebDriverRunner.driver();
     }
 }

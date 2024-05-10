@@ -9,15 +9,11 @@ import ua.edu.cdu.vu.price.aggregator.api.util.driver.SelenideWebDriver;
 @Configuration
 public class SelenideConfig {
 
-    @Value("${price-aggregator-api.selenide.headless:true}")
-    private boolean headless;
-
     @Value("${price-aggregator-api.selenide.timeout:4000}")
     private int timeout;
 
     @PostConstruct
     public void init() {
-        com.codeborne.selenide.Configuration.headless = headless;
         com.codeborne.selenide.Configuration.timeout = timeout;
     }
 

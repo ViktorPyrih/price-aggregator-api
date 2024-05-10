@@ -2,6 +2,8 @@ logging:
   level:
     ua.edu.cdu.vu.price.aggregator: DEBUG
 price-aggregator-api:
-  selenide.headless: true
+  web-driver:
+    headless: true
+    pool:
+      capacity: 10
   dsl.evaluation.scenario.debug: false
-  products.scrapping.concurrent: true
