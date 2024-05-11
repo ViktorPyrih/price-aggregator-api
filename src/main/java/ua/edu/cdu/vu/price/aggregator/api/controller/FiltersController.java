@@ -8,7 +8,6 @@ import ua.edu.cdu.vu.price.aggregator.api.service.FiltersService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 import ua.edu.cdu.vu.price.aggregator.api.util.RequestUtils;
-import ua.edu.cdu.vu.price.aggregator.api.validation.subcategories.SubcategoriesRequestValidator;
 
 @RestController
 @ApiKeySecuritySchema
@@ -17,12 +16,10 @@ import ua.edu.cdu.vu.price.aggregator.api.validation.subcategories.Subcategories
 public class FiltersController {
 
     private final FiltersService filtersService;
-    private final SubcategoriesRequestValidator subcategoriesRequestValidator;
 
     @ApiKeyRequired
     @GetMapping
     public FiltersResponse getFilters(HttpServletRequest request, @PathVariable String marketplace, @RequestParam String category) {
-        subcategoriesRequestValidator.validate(request, marketplace);
         return filtersService.getFilters(marketplace, category, RequestUtils.extractSubcategories(request));
     }
 }

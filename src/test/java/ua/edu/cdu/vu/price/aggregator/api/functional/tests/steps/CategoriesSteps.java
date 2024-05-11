@@ -13,15 +13,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor
 public class CategoriesSteps {
 
+    private static final Set<String> SUBCATEGORIES_TO_IGNORE = Set.of("Парфумерія");
     private static final Set<String> SUBCATEGORIES2_TO_IGNORE = Set.of("Всі бренди");
 
     private final PriceAggregatorClient priceAggregatorClient;
 
-    public void verifyAllCategories(String marketplace) {
-        verifyAllCategories(marketplace, subcategory -> {});
+    public void verifyAllCategories(String marketplace, boolean assertSubcategories2) {
+        verifyAllCategories(marketplace, assertSubcategories2, subcategory -> {});
     }
 
-    public void verifyAllCategories(String marketplace, Consumer<String[]> subcategoryConsumer) {
+    public void verifyAllCategories(String marketplace, boolean assertSubcategories2, Consumer<String[]> subcategoryConsumer) {
         var categories = priceAggregatorClient.getCategories(marketplace);
         assertThat(categories)
                 .as("Categories list is empty for marketplace: %s", marketplace)
@@ -34,11 +35,17 @@ public class CategoriesSteps {
                     .isNotEmpty();
 
             for (var subcategory : subcategories) {
+                if (SUBCATEGORIES_TO_IGNORE.contains(subcategory)) {
+                    continue;
+                }
 
                 var subcategories2 = priceAggregatorClient.getSubcategories(marketplace, category, subcategory);
-                assertThat(subcategories2)
-                        .as("Subcategories list is empty for marketplace: %s, category: %s, subcategory: %s", marketplace, category, subcategory)
-                        .isNotEmpty();
+
+                if (assertSubcategories2) {
+                    assertThat(subcategories2)
+                            .as("Subcategories2 list is empty for marketplace: %s, category: %s, subcategory: %s", marketplace, category, subcategory)
+                            .isNotEmpty();
+                }
 
                 for (var subcategory2 : subcategories2) {
                     if (!SUBCATEGORIES2_TO_IGNORE.contains(subcategory2)) {

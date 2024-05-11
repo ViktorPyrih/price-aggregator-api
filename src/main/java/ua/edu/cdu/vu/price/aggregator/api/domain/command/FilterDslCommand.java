@@ -4,7 +4,6 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.conditions.InnerText;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
 import ua.edu.cdu.vu.price.aggregator.api.util.InnerTextBySelector;
 import ua.edu.cdu.vu.price.aggregator.api.util.driver.WebDriver;
 
@@ -29,7 +28,7 @@ public class FilterDslCommand extends DslCommand<ElementsCollection, ElementsCol
         String resolvedText = parse(text, context);
 
         if (isNull(resolvedText)) {
-            throw new DslValidationException("Expression: %s shouldn't return null".formatted(text));
+            return input;
         }
 
         if (isNull(selector)) {

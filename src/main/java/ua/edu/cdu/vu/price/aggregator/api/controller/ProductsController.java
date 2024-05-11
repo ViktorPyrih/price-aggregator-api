@@ -12,7 +12,6 @@ import ua.edu.cdu.vu.price.aggregator.api.service.ProductsService;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeyRequired;
 import ua.edu.cdu.vu.price.aggregator.api.swagger.ApiKeySecuritySchema;
 import ua.edu.cdu.vu.price.aggregator.api.util.RequestUtils;
-import ua.edu.cdu.vu.price.aggregator.api.validation.subcategories.SubcategoriesRequestValidator;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -25,7 +24,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class ProductsController {
 
     private final ProductsService productsService;
-    private final SubcategoriesRequestValidator subcategoriesRequestValidator;
 
     @ApiKeyRequired
     @RequestMapping(method = {GET, POST})
@@ -34,7 +32,6 @@ public class ProductsController {
                                         @RequestParam String category,
                                         @RequestBody @Valid ProductsRequest productsRequest,
                                         @RequestParam(required = false, defaultValue = "1") @Positive int page) {
-        subcategoriesRequestValidator.validate(request, marketplace);
         return productsService.getProducts(marketplace, category, RequestUtils.extractSubcategories(request), productsRequest, page);
     }
 }
