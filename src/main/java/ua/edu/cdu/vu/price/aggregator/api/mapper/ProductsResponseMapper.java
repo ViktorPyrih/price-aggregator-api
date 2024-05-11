@@ -12,7 +12,8 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface ProductsResponseMapper {
 
-    default ProductsResponse convertToResponse(List<String> productLinks,
+    default ProductsResponse convertToResponse(String marketplace,
+                                               List<String> productLinks,
                                                List<String> productImages,
                                                List<String> productPriceImages,
                                                List<String> productDescriptionImages,
@@ -24,6 +25,7 @@ public interface ProductsResponseMapper {
         return ProductsResponse.builder()
                 .products(IntStream.range(0, productsCount)
                         .mapToObj(i -> ProductsResponse.Product.builder()
+                                .marketplace(marketplace)
                                 .link(productLinks.get(i))
                                 .image(productImages.get(i))
                                 .priceImage(productPriceImages.get(i))
@@ -36,13 +38,14 @@ public interface ProductsResponseMapper {
                 .build();
     }
 
-    default ProductsResponse convertToResponse(List<String> productLinks,
+    default ProductsResponse convertToResponse(String marketplace,
+                                               List<String> productLinks,
                                                List<String> productImages,
                                                List<String> productPriceImages,
                                                List<String> productDescriptionImages,
                                                List<String> productTitles,
                                                List<String> productPrices) {
-        return convertToResponse(productLinks, productImages, productPriceImages, productDescriptionImages, productTitles, productPrices, 1);
+        return convertToResponse(marketplace, productLinks, productImages, productPriceImages, productDescriptionImages, productTitles, productPrices, 1);
     }
 
     private static int min(int... numbers) {

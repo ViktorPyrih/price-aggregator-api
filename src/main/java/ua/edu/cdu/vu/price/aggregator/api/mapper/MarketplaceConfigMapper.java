@@ -9,5 +9,5 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface MarketplaceConfigMapper {
 
-    MarketplaceConfig convertToDomain(MarketplaceConfigProperties.Part part);
+    MarketplaceConfig convertToDomain(String marketplace, MarketplaceConfigProperties.Part part);
 }

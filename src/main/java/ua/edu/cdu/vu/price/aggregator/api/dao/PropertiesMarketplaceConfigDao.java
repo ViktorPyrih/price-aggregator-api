@@ -20,13 +20,13 @@ public class PropertiesMarketplaceConfigDao implements MarketplaceConfigDao {
     @Override
     public MarketplaceConfig load(String marketplace) {
         MarketplaceConfigProperties.Part part = marketplaceConfigProperties.get(marketplace);
-        return marketplaceConfigMapper.convertToDomain(part);
+        return marketplaceConfigMapper.convertToDomain(marketplace, part);
     }
 
     @Override
     public Map<String, MarketplaceConfig> loadAll() {
         return marketplaceConfigProperties.getMarketplaceConfig().entrySet().stream()
-                .map(entry -> Map.entry(entry.getKey(), marketplaceConfigMapper.convertToDomain(entry.getValue())))
+                .map(entry -> Map.entry(entry.getKey(), marketplaceConfigMapper.convertToDomain(entry.getKey(), entry.getValue())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

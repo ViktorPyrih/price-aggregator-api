@@ -82,7 +82,7 @@ public class ProductsService {
                 selectorConfig.linkSelector(), selectorConfig.imageSelector(), selectorConfig.priceImgSelector(), selectorConfig.descriptionImgSelector(), selectorConfig.titleSelector(), selectorConfig.priceSelector());
         var results = dslEvaluationService.evaluate(request).getValues();
 
-        return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1),
+        return productsResponseMapper.convertToResponse(marketplaceConfig.marketplace(), (List<String>) results.get(0), (List<String>) results.get(1),
                 (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4), (List<String>) results.get(5));
     }
 
@@ -128,7 +128,7 @@ public class ProductsService {
                     .map(Integer::parseInt)
                     .orElse(FIRST_PAGE);
 
-            return productsResponseMapper.convertToResponse((List<String>) results.get(0), (List<String>) results.get(1),
+            return productsResponseMapper.convertToResponse(marketplaceConfig.marketplace(), (List<String>) results.get(0), (List<String>) results.get(1),
                     (List<String>) results.get(2), (List<String>) results.get(3), (List<String>) results.get(4), (List<String>) results.get(5), pagesCount);
         } catch (DslExecutionException e) {
             throw exceptionMapper.apply(e);
