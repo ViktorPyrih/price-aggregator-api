@@ -1,8 +1,8 @@
-package ua.edu.cdu.vu.price.aggregator.api.job.decorator;
+package ua.edu.cdu.vu.price.aggregator.api.functional.tests.decorator;
 
 import lombok.RequiredArgsConstructor;
-import ua.edu.cdu.vu.price.aggregator.api.job.client.PriceAggregatorClient;
-import ua.edu.cdu.vu.price.aggregator.api.job.model.FiltersResponse;
+import ua.edu.cdu.vu.price.aggregator.api.functional.tests.client.PriceAggregatorClient;
+import ua.edu.cdu.vu.price.aggregator.api.functional.tests.model.FiltersResponse;
 
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -30,7 +30,7 @@ public class PriceAggregatorClientBulkhead implements PriceAggregatorClient {
     }
 
     @Override
-    public FiltersResponse getFilters(String marketplace, String category, String subcategory1, String subcategory2) {
+    public List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2) {
         return runInSemaphore(() -> client.getFilters(marketplace, category, subcategory1, subcategory2));
     }
 

@@ -1,4 +1,4 @@
-package ua.edu.cdu.vu.price.aggregator.api.job.model;
+package ua.edu.cdu.vu.price.aggregator.api.functional.tests.model;
 
 import java.util.List;
 
