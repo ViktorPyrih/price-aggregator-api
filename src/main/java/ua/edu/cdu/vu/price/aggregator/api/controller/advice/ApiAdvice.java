@@ -7,9 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
-import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
-import ua.edu.cdu.vu.price.aggregator.api.exception.DslValidationException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.*;
 import ua.edu.cdu.vu.price.aggregator.api.validation.HttpRequestNotValidException;
 
 import java.util.stream.Collectors;
@@ -48,6 +46,18 @@ public class ApiAdvice {
     @ExceptionHandler({UnsupportedOperationException.class, HttpRequestNotValidException.class})
     public ProblemDetail handleUnsupportedOperationExceptions(UnsupportedOperationException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({MarketplaceNotFoundException.class})
+    public ProblemDetail handleMarketplaceNotFoundException(MarketplaceNotFoundException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ExceptionHandler({SearchNotConfiguredException.class})
+    public ProblemDetail handleSearchNotConfiguredException(SearchNotConfiguredException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_IMPLEMENTED, e.getMessage());
     }
 
     private String getDetail(MethodArgumentNotValidException e) {

@@ -2,7 +2,6 @@ package ua.edu.cdu.vu.price.aggregator.api.dao;
 
 import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
 
-import java.util.List;
 import java.util.Map;
 
 public interface MarketplaceConfigDao {
@@ -11,5 +10,4 @@ public interface MarketplaceConfigDao {
 
     Map<String, MarketplaceConfig> loadAll();
 
-    List<String> getAllMarketplaces();
 }

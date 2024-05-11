@@ -62,7 +62,7 @@ public class MarketplaceConfigProperties {
                                        List<@NotBlank String> other) {
     }
 
-    public record TemplateConfig(@NotBlank String template) {
+    public record TemplateConfig(@NotBlank String template, int index) {
     }
 
     public Part get(String marketplace) {

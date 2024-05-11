@@ -1,7 +1,10 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record SearchSelectorConfig(List<String> actions,
                                    String imageSelector,
                                    String linkSelector,

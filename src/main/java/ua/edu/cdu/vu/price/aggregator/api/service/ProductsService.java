@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
-import ua.edu.cdu.vu.price.aggregator.api.domain.*;
+import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.ProductsSelectorConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.SearchSelectorConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.TemplateConfig;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
 import ua.edu.cdu.vu.price.aggregator.api.exception.CategoriesNotFoundException;
 import ua.edu.cdu.vu.price.aggregator.api.exception.DslExecutionException;
+import ua.edu.cdu.vu.price.aggregator.api.exception.SearchNotConfiguredException;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.DslEvaluationRequestMapper;
 import ua.edu.cdu.vu.price.aggregator.api.mapper.ProductsResponseMapper;
 
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static ua.edu.cdu.vu.price.aggregator.api.util.CommonConstants.*;
 
@@ -39,8 +44,7 @@ public class ProductsService {
     private final ProductsResponseMapper productsResponseMapper;
 
     public ProductsResponse search(String query) {
-        var futures = marketplaceConfigDao.getAllMarketplaces().stream()
-                .map(marketplaceConfigDao::load)
+        var futures = marketplaceConfigDao.loadAll().values().stream()
                 .filter(marketplaceConfig -> nonNull(marketplaceConfig.search()))
                 .map(marketplaceConfig -> CompletableFuture.supplyAsync(() -> search(marketplaceConfig, query), taskExecutor))
                 .toArray(CompletableFuture[]::new);
@@ -55,6 +59,10 @@ public class ProductsService {
 
     public ProductsResponse search(String marketplace, String query) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
+        if (isNull(marketplaceConfig.search())) {
+            throw new SearchNotConfiguredException(marketplace);
+        }
+
         return search(marketplaceConfig, query);
     }
 
@@ -103,7 +111,7 @@ public class ProductsService {
     }
 
     private static Map<String, Object> createArgumentsMap(String category, Map<String, String> subcategories, ProductsRequest productsRequest, int page) {
-        HashMap<String, Object> arguments = new HashMap<>(subcategories);
+        Map<String, Object> arguments = new HashMap<>(subcategories);
         arguments.put(CATEGORY, category);
         arguments.put(MIN_PRICE, productsRequest.getMinPrice());
         arguments.put(MAX_PRICE, productsRequest.getMaxPrice());
@@ -155,13 +163,10 @@ public class ProductsService {
 
     private static DslEvaluationRequest enrichRequestWithFilterActions(DslEvaluationRequest request, TemplateConfig templateConfig, int filtersCount) {
         var dynamicActions = IntStream.range(0, filtersCount)
-                .mapToObj(index -> templateConfig.template().formatted(index, index));
-        var actions = Stream.of(
-                        request.getActions().subList(0, request.getActions().size() - 2).stream(),
-                        dynamicActions,
-                        request.getActions().subList(request.getActions().size() - 2, request.getActions().size()).stream())
-                .flatMap(Function.identity())
+                .mapToObj(index -> templateConfig.template().formatted(index, index))
                 .toList();
+        var actions = new LinkedList<>(request.getActions());
+        actions.addAll(templateConfig.index(), dynamicActions);
 
         return request.withActions(actions);
     }
