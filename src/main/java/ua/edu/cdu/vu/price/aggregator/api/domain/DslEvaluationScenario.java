@@ -69,7 +69,9 @@ public class DslEvaluationScenario implements AutoCloseable {
             log.debug("DSL evaluation scenario finished. About to sleep for debugging purposes for {} second(s)", SECONDS_TO_SLEEP_ON_CLOSE);
             sleep();
         }
+        log.debug("DSL evaluation scenario finished. About to close web driver");
         webDriver.close();
+        log.debug("Web driver closed successfully");
     }
 
     private List<Object> evaluateExpressions(String url, Map<String, Object> context) {

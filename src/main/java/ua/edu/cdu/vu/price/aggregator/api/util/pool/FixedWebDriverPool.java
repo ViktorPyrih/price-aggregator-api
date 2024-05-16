@@ -19,12 +19,14 @@ import java.util.stream.IntStream;
 public class FixedWebDriverPool implements WebDriverPool, Runnable {
 
     private static final int HEALTH_CHECK_INTERVAL_SECONDS = 60;
+    private static final int CLOSE_TIMEOUT_SECONDS = 30;
 
     private final int capacity;
     private final long timeoutMillis;
     private final BlockingQueue<WebDriverProxy> webDrivers;
     private final Supplier<WebDriver> factory;
     private final ScheduledExecutorService scheduler;
+    private final ExecutorService executor;
 
     public FixedWebDriverPool(int capacity, long timeoutMillis, Supplier<WebDriver> factory) {
         this.capacity = capacity;
@@ -32,6 +34,7 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
         this.timeoutMillis = timeoutMillis;
         this.factory = factory;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.executor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -63,10 +66,9 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
     @Override
     public void close() {
         log.info("About to close web driver pool");
-        webDrivers.stream()
-                .map(WebDriverProxy::unwrap)
-                .forEach(WebDriver::close);
+        webDrivers.forEach(this::close);
         scheduler.shutdownNow();
+        executor.shutdownNow();
         log.info("Web driver pool closed successfully");
     }
 
@@ -80,8 +82,6 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
         log.info("Health check of web driver pool started: {}", webDrivers.size());
         int webDriversRemovedCount = (int) webDrivers.stream()
                 .filter(this::healthCheck)
-                .toList()
-                .stream()
                 .filter(webDrivers::remove)
                 .count();
         if (webDriversRemovedCount > 0) {
@@ -96,13 +96,23 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
         try {
             webDriver.getCurrentUrl();
         } catch (RuntimeException e) {
-            log.warn("Web driver is not available anymore, closing it");
-            webDriver.unwrap().close();
+            log.warn("Web driver is not available anymore, closing it. Cause: ", e);
+            close(webDriver);
 
             return true;
         }
 
         return false;
+    }
+
+    private void close(WebDriverProxy webDriver) {
+        try {
+            executor.submit(() -> webDriver.unwrap().close()).get(CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            log.error("Failed to close web driver in {} seconds", CLOSE_TIMEOUT_SECONDS);
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Failed to close web driver", e);
+        }
     }
 
     private interface WebDriverProxy extends WebDriver, JavascriptExecutor, TakesScreenshot, Interactive {
@@ -115,6 +125,7 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
 
         private static final String QUIT = "quit";
         private static final String UNWRAP = "unwrap";
+        private static final String EQUALS = "equals";
 
         private final WebDriver delegate;
 
@@ -125,6 +136,9 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
             }
             if (method.getName().equals(UNWRAP)) {
                 return delegate;
+            }
+            if (method.getName().equals(EQUALS)) {
+                return proxy == args[0];
             }
 
             return method.invoke(delegate, args);

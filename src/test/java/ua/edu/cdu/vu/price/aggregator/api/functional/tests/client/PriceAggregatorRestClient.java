@@ -2,6 +2,9 @@ package ua.edu.cdu.vu.price.aggregator.api.functional.tests.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import ua.edu.cdu.vu.price.aggregator.api.functional.tests.model.CategoriesResponse;
 import ua.edu.cdu.vu.price.aggregator.api.functional.tests.model.FiltersResponse;
@@ -12,10 +15,17 @@ import static io.restassured.RestAssured.given;
 
 @Slf4j
 @Component
+@EnableRetry
+@Retryable(
+        retryFor = AssertionError.class,
+        exceptionExpression = "message.contains('500')",
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+)
 public class PriceAggregatorRestClient implements PriceAggregatorClient {
 
     private static final String BASE_PATH = "/api/v1";
 
+    @Override
     public List<String> getCategories(String marketplace) {
         log.info("Getting categories for marketplace: {}", marketplace);
 
@@ -26,6 +36,7 @@ public class PriceAggregatorRestClient implements PriceAggregatorClient {
                 .categories();
     }
 
+    @Override
     public List<String> getSubcategories(String marketplace, String category) {
         log.info("Getting subcategories for marketplace: {}, category: {}", marketplace, category);
 
@@ -36,6 +47,7 @@ public class PriceAggregatorRestClient implements PriceAggregatorClient {
                 .categories();
     }
 
+    @Override
     public List<String> getSubcategories(String marketplace, String category, String subcategory) {
         log.info("Getting subcategories for marketplace: {}, category: {}, subcategory: {}", marketplace, category, subcategory);
 

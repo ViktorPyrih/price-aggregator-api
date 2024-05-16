@@ -98,7 +98,7 @@ public class ProductsService {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
         ProductsSelectorConfig selectorConfig = marketplaceConfig.products();
 
-        List<Map.Entry<String, String>> filters = extractFilters(productsRequest, extractLastSubcategory(subcategories));
+        var filters = extractFilters(productsRequest, extractLastSubcategory(subcategories));
 
         var arguments = createArgumentsMap(category, subcategories, productsRequest, page);
         arguments = enrichArguments(arguments, filters, KEY_TEMPLATE, Map.Entry::getKey);

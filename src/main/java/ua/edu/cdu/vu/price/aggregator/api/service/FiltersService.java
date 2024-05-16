@@ -29,7 +29,7 @@ public class FiltersService {
     @Cacheable("filters")
     public FiltersResponse getFilters(String marketplace, String category, Map<String, String> subcategories) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
-        Map<String, Object> arguments = subcategoriesService.getSubcategoriesMap(marketplace, category, subcategories);
+        var arguments = subcategoriesService.getSubcategoriesMap(marketplace, category, subcategories);
         DslEvaluationRequest request = dslEvaluationRequestMapper.convertToRequest(marketplaceConfig.url(), marketplaceConfig.filters(), arguments);
 
         try {

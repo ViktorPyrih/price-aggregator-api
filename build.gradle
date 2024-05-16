@@ -49,6 +49,8 @@ dependencies {
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.retry:spring-retry'
+    testImplementation 'org.springframework.boot:spring-boot-starter-aop'
 
     testImplementation 'io.rest-assured:rest-assured:5.4.0'
 

@@ -35,7 +35,7 @@ public class CategoriesService {
     public CategoriesResponse getSubcategories(String marketplace, String category, Map<String, String> subcategories) {
         MarketplaceConfig marketplaceConfig = marketplaceConfigDao.load(marketplace);
 
-        Map<String, Object> arguments = subcategoriesService.getSubcategoriesMap(marketplace, category, subcategories);
+        var arguments = subcategoriesService.getSubcategoriesMap(marketplace, category, subcategories);
 
         var subcategoriesConfig = marketplaceConfig.subcategories();
 

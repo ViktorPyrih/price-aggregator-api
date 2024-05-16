@@ -23,6 +23,7 @@ import java.util.Map;
 public class DslExpression<T> implements Serializable {
 
     private static final int MAX_ATTEMPTS = 3;
+    private static final String KEY_TEMPLATE = "'%s'";
 
     private final String expression;
     private final List<DslCommand> commands;
@@ -74,6 +75,7 @@ public class DslExpression<T> implements Serializable {
 
     public String toString(Map<String, Object> context) {
         return context.entrySet().stream()
-                .reduce(expression, (expression, entry) -> expression.replace(entry.getKey(), entry.getValue().toString()), (expression1, expression2) -> expression2);
+                .reduce(expression, (expression, entry) -> expression.replace(KEY_TEMPLATE.formatted(entry.getKey()), entry.getValue().toString()),
+                        (expression1, expression2) -> expression2);
     }
 }
