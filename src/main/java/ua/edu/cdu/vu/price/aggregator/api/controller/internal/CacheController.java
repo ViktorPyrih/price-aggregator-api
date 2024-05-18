@@ -1,4 +1,4 @@
-package ua.edu.cdu.vu.price.aggregator.api.controller;
+package ua.edu.cdu.vu.price.aggregator.api.controller.internal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

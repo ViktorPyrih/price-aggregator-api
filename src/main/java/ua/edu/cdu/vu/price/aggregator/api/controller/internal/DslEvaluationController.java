@@ -1,4 +1,4 @@
-package ua.edu.cdu.vu.price.aggregator.api.controller;
+package ua.edu.cdu.vu.price.aggregator.api.controller.internal;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

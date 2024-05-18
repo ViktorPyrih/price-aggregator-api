@@ -15,6 +15,17 @@ spring:
     redis:
       host: localhost
       port: 6379
+  ai:
+    openai:
+      api-key: ENC(M+h/SHskI3b8WOYsdllhXYzBUZigYYFmXo6gf9z1bQ6Z3AVAzuFGw62uUVrKMhd9zGTb312FWLIA7Ieo8A2xHZH73lzdyJeFCppdw3X+Vr42t47uYDnGWm42hUPklR9+)
+resilience4j:
+  ratelimiter:
+    instances:
+      openai:
+        limit-for-period: 3
+        limit-refresh-period: 1m
+        timeout-duration: 1m
+        register-health-indicator: true
 price-aggregator-api:
   config:
     subcategories:
