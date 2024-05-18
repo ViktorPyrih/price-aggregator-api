@@ -2,7 +2,6 @@ package ua.edu.cdu.vu.price.aggregator.api.functional.tests;
 
 import org.junit.jupiter.api.Test;
 
-//@Disabled
 public class CategoriesFunctionalTest extends BaseFunctionalTest {
 
     @Test

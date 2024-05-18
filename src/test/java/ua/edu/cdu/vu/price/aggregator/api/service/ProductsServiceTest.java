@@ -7,10 +7,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
-import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.ProductsSelectorConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.SearchSelectorConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.TemplateConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.*;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationResponse;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
@@ -27,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
@@ -52,6 +50,9 @@ class ProductsServiceTest {
     @Mock
     private DslEvaluationService dslEvaluationService;
 
+    @Mock
+    private ProductCategoryGenerator productCategoryGenerator;
+
     private final ExecutorService taskExecutor = MoreExecutors.newDirectExecutorService();
 
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper = Mappers.getMapper(DslEvaluationRequestMapper.class);
@@ -62,7 +63,7 @@ class ProductsServiceTest {
 
     @BeforeEach
     void setUp() {
-        unit = new ProductsService(taskExecutor, marketplaceConfigDao, dslEvaluationService, dslEvaluationRequestMapper, productsResponseMapper);
+        unit = new ProductsService(taskExecutor, marketplaceConfigDao, dslEvaluationService, dslEvaluationRequestMapper, productsResponseMapper, productCategoryGenerator);
     }
 
     @Test
@@ -83,7 +84,7 @@ class ProductsServiceTest {
                 .ignoringCollectionOrder()
                 .isEqualTo(buildProductsResponse(1, MARKETPLACE1, MARKETPLACE2));
 
-        verify(dslEvaluationService, times(2)).evaluate(buildDslEvaluationRequest());
+        verify(dslEvaluationService, times(2)).evaluate(buildDslEvaluationRequest(QUERY));
     }
 
     @Test
@@ -93,12 +94,30 @@ class ProductsServiceTest {
 
         ProductsResponse response = unit.search(MARKETPLACE1, QUERY);
 
+        assertProductsResponse(response);
+
+        verify(dslEvaluationService).evaluate(buildDslEvaluationRequest(QUERY));
+    }
+
+    @Test
+    void search_whenAiEnabled_shouldSearchByQueryAndMarketplaceWithCategoryGeneration() {
+        when(marketplaceConfigDao.load(MARKETPLACE1)).thenReturn(buildMarketplaceConfig(MARKETPLACE1, buildSearchSelectorConfig(true)));
+        when(dslEvaluationService.evaluate(any())).thenReturn(buildDslEvaluationResponse());
+        when(productCategoryGenerator.generate(any())).thenReturn(new Category(SOME_STRING));
+
+        ProductsResponse response = unit.search(MARKETPLACE1, QUERY);
+
+        assertProductsResponse(response);
+
+        verify(productCategoryGenerator).generate(QUERY);
+        verify(dslEvaluationService).evaluate(buildDslEvaluationRequest(String.join(SPACE, SOME_STRING, QUERY)));
+    }
+
+    private void assertProductsResponse(ProductsResponse response) {
         assertThat(response)
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
                 .isEqualTo(buildProductsResponse(1, MARKETPLACE1));
-
-        verify(dslEvaluationService).evaluate(buildDslEvaluationRequest());
     }
 
     @Test
@@ -152,8 +171,9 @@ class ProductsServiceTest {
                 .build();
     }
 
-    private static SearchSelectorConfig buildSearchSelectorConfig() {
+    private static SearchSelectorConfig buildSearchSelectorConfig(boolean aiEnabled) {
         return SearchSelectorConfig.builder()
+                .aiEnabled(aiEnabled)
                 .titleSelector(SOME_DSL)
                 .imageSelector(SOME_DSL)
                 .linkSelector(SOME_DSL)
@@ -161,6 +181,10 @@ class ProductsServiceTest {
                 .priceImgSelector(SOME_DSL)
                 .descriptionImgSelector(SOME_DSL)
                 .build();
+    }
+
+    private static SearchSelectorConfig buildSearchSelectorConfig() {
+        return buildSearchSelectorConfig(false);
     }
 
     private static ProductsSelectorConfig buildProductsSelectorConfig() {
@@ -179,10 +203,10 @@ class ProductsServiceTest {
                 .build();
     }
 
-    private static DslEvaluationRequest buildDslEvaluationRequest() {
+    private static DslEvaluationRequest buildDslEvaluationRequest(String query) {
         return DslEvaluationRequest.builder()
                 .target(new DslEvaluationRequest.Target(URL))
-                .arguments(Map.of(QUERY, QUERY))
+                .arguments(Map.of(QUERY, query))
                 .expressions(Collections.nCopies(6, SOME_DSL))
                 .build();
     }
