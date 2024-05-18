@@ -4,7 +4,6 @@ import com.codeborne.selenide.ex.ElementNotFound;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.WebDriverException;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.DslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.OpenDslCommand;
 import ua.edu.cdu.vu.price.aggregator.api.domain.command.StartDslCommand;
@@ -62,8 +61,7 @@ public class DslExpression<T> implements Serializable {
     }
 
     private boolean shouldRetry(Throwable e) {
-        return e instanceof ElementNotFound || e instanceof WebDriverException
-                || e.getCause() != null && e.getCause() instanceof WebDriverException;
+        return e instanceof ElementNotFound;
     }
 
     public void addCommand(DslCommand command) {

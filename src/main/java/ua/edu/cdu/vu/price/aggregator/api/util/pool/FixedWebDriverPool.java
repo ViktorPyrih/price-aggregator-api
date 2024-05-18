@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Interactive;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Optional;
@@ -24,14 +25,14 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
 
     private final int capacity;
     private final long timeoutMillis;
-    private final BlockingQueue<WebDriverProxy> webDrivers;
+    private final BlockingDeque<WebDriverProxy> webDrivers;
     private final Supplier<WebDriver> factory;
     private final ScheduledExecutorService scheduler;
     private final ExecutorService executor;
 
     public FixedWebDriverPool(int capacity, long timeoutMillis, Supplier<WebDriver> factory) {
         this.capacity = capacity;
-        this.webDrivers = new ArrayBlockingQueue<>(capacity);
+        this.webDrivers = new LinkedBlockingDeque<>(capacity);
         this.timeoutMillis = timeoutMillis;
         this.factory = factory;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -51,14 +52,14 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
         IntStream.range(0, webDriversToAdd)
                 .mapToObj(i -> factory.get())
                 .map(this::createWebDriverProxy)
-                .forEach(webDrivers::add);
+                .forEach(webDrivers::addFirst);
     }
 
     @Override
     public WebDriver getDriver() {
         try {
             return Optional.ofNullable(webDrivers.poll(timeoutMillis, TimeUnit.MILLISECONDS))
-                    .orElseThrow(() -> new WebDriverNotAvailableException(timeoutMillis)).unwrap();
+                    .orElseThrow(() -> new WebDriverNotAvailableException(timeoutMillis));
         } catch (InterruptedException e) {
             throw new WebDriverNotAvailableException(e);
         }
@@ -154,9 +155,16 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
 
             try {
                 return method.invoke(delegate, args);
-            } catch (WebDriverException e) {
-                shouldClose = true;
+            } catch (InvocationTargetException e) {
+                handleWebDriverException(e, method);
                 throw e;
+            }
+        }
+
+        private void handleWebDriverException(InvocationTargetException e, Method method) throws InvocationTargetException {
+            if (e.getTargetException() instanceof WebDriverException) {
+                shouldClose = true;
+                log.debug("Failed to execute method: {} on web driver", method.getName(), e);
             }
         }
     }

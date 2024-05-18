@@ -22,9 +22,11 @@ public class SelenideWebDriver implements WebDriver {
     @Override
     public void close() {
         // as a workaround to reuse web driver instances
-        open(INITIAL_URL);
-
-        Selenide.closeWebDriver();
+        try {
+            open(INITIAL_URL);
+        } finally {
+            Selenide.closeWebDriver();
+        }
     }
 
     @Override
