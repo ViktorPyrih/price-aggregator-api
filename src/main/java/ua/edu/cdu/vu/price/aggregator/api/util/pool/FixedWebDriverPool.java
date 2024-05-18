@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Interactive;
 
 import java.lang.reflect.InvocationHandler;
@@ -57,7 +58,7 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
     public WebDriver getDriver() {
         try {
             return Optional.ofNullable(webDrivers.poll(timeoutMillis, TimeUnit.MILLISECONDS))
-                    .orElseThrow(() -> new WebDriverNotAvailableException(timeoutMillis));
+                    .orElseThrow(() -> new WebDriverNotAvailableException(timeoutMillis)).unwrap();
         } catch (InterruptedException e) {
             throw new WebDriverNotAvailableException(e);
         }
@@ -77,7 +78,6 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
     }
 
     @Override
-    @SuppressWarnings("all")
     public void run() {
         log.info("Health check of web driver pool started: {}", webDrivers.size());
         int webDriversRemovedCount = (int) webDrivers.stream()
@@ -106,8 +106,12 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
     }
 
     private void close(WebDriverProxy webDriver) {
+        close(webDriver.unwrap());
+    }
+
+    private void close(WebDriver webDriver) {
         try {
-            executor.submit(() -> webDriver.unwrap().close()).get(CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            executor.submit(webDriver::quit).get(CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             log.error("Failed to close web driver in {} seconds", CLOSE_TIMEOUT_SECONDS);
         } catch (InterruptedException | ExecutionException e) {
@@ -129,8 +133,15 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
 
         private final WebDriver delegate;
 
+        private boolean shouldClose;
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if (shouldClose && method.getName().equals(QUIT)) {
+                close(delegate);
+                initialize(1);
+                return null;
+            }
             if (method.getName().equals(QUIT)) {
                 return webDrivers.add(createWebDriverProxy(delegate));
             }
@@ -141,7 +152,12 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
                 return proxy == args[0];
             }
 
-            return method.invoke(delegate, args);
+            try {
+                return method.invoke(delegate, args);
+            } catch (WebDriverException e) {
+                shouldClose = true;
+                throw e;
+            }
         }
     }
 }
