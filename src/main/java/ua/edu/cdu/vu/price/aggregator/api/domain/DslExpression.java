@@ -73,7 +73,7 @@ public class DslExpression<T> implements Serializable {
 
     public String toString(Map<String, Object> context) {
         return context.entrySet().stream()
-                .reduce(expression, (expression, entry) -> expression.replace(KEY_TEMPLATE.formatted(entry.getKey()), entry.getValue().toString()),
+                .reduce(expression, (expression, entry) -> expression.replace(KEY_TEMPLATE.formatted(entry.getKey()), KEY_TEMPLATE.formatted(entry.getValue())),
                         (expression1, expression2) -> expression2);
     }
 }

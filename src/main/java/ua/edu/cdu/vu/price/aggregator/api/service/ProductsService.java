@@ -1,13 +1,11 @@
 package ua.edu.cdu.vu.price.aggregator.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ua.edu.cdu.vu.price.aggregator.api.dao.MarketplaceConfigDao;
-import ua.edu.cdu.vu.price.aggregator.api.domain.MarketplaceConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.ProductsSelectorConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.SearchSelectorConfig;
-import ua.edu.cdu.vu.price.aggregator.api.domain.TemplateConfig;
+import ua.edu.cdu.vu.price.aggregator.api.domain.*;
 import ua.edu.cdu.vu.price.aggregator.api.dto.DslEvaluationRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsRequest;
 import ua.edu.cdu.vu.price.aggregator.api.dto.ProductsResponse;
@@ -27,8 +25,10 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static ua.edu.cdu.vu.price.aggregator.api.util.CommonConstants.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductsService {
@@ -42,6 +42,7 @@ public class ProductsService {
     private final DslEvaluationService dslEvaluationService;
     private final DslEvaluationRequestMapper dslEvaluationRequestMapper;
     private final ProductsResponseMapper productsResponseMapper;
+    private final ProductCategoryGenerator productCategoryGenerator;
 
     public ProductsResponse search(String query) {
         var futures = marketplaceConfigDao.loadAll().values().stream()
@@ -70,7 +71,15 @@ public class ProductsService {
 
         SearchSelectorConfig selectorConfig = marketplaceConfig.search();
 
-        Map<String, Object> arguments = Map.of(QUERY, query);
+        String modifiedQuery = query;
+        if (selectorConfig.aiEnabled()) {
+            Category category = productCategoryGenerator.generate(query);
+            modifiedQuery = String.join(SPACE, category.name(), query);
+        }
+
+        Map<String, Object> arguments = Map.of(QUERY, modifiedQuery);
+
+        log.debug("Searching for products on marketplace: {} with query: {}, modified query: {}", marketplaceConfig.marketplace(), query, modifiedQuery);
 
         return scrapeProducts(marketplaceConfig, selectorConfig, arguments);
     }

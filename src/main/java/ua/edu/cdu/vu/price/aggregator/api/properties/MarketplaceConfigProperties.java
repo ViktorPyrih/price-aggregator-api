@@ -51,7 +51,8 @@ public class MarketplaceConfigProperties {
         }
     }
 
-    public record SearchSelectorConfig(List<@NotBlank String> actions,
+    public record SearchSelectorConfig(boolean aiEnabled,
+                                       List<@NotBlank String> actions,
                                        @NotBlank String imageSelector,
                                        @NotBlank String linkSelector,
                                        @NotBlank String priceImgSelector,

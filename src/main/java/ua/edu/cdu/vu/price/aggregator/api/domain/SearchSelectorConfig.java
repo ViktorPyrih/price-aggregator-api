@@ -5,7 +5,8 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record SearchSelectorConfig(List<String> actions,
+public record SearchSelectorConfig(boolean aiEnabled,
+                                   List<String> actions,
                                    String imageSelector,
                                    String linkSelector,
                                    String priceImgSelector,
