@@ -59,11 +59,33 @@ public class PriceAggregatorRestClient implements PriceAggregatorClient {
     }
 
     @Override
+    public List<String> getSubcategories(String marketplace, String category, String subcategory1, String subcategory2) {
+        log.info("Getting subcategories for marketplace: {}, category: {}, subcategory1: {}, subcategory2: {}", marketplace, category, subcategory1, subcategory2);
+
+        return given().basePath(BASE_PATH)
+                .when().get("/marketplaces/{marketplace}/subcategories?category={category}&subcategory1={subcategory1}&subcategory2={subcategory2}", marketplace, category, subcategory1, subcategory2)
+                .then().statusCode(HttpStatus.OK.value())
+                .extract().as(CategoriesResponse.class)
+                .categories();
+    }
+
+    @Override
     public List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2) {
-        log.info("Verifying filters for marketplace: {}, category: {}, subcategory1: {}, subcategory2: {}", marketplace, category, subcategory1, subcategory2);
+        log.info("Getting filters for marketplace: {}, category: {}, subcategory1: {}, subcategory2: {}", marketplace, category, subcategory1, subcategory2);
 
         return given().basePath(BASE_PATH)
                 .when().get("/marketplaces/{marketplace}/filters?category={category}&subcategory1={subcategory1}&subcategory2={subcategory2}", marketplace, category, subcategory1, subcategory2)
+                .then().statusCode(HttpStatus.OK.value())
+                .extract().as(FiltersResponse.class)
+                .filters();
+    }
+
+    @Override
+    public List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2, String subcategory3) {
+        log.info("Getting filters for marketplace: {}, category: {}, subcategory1: {}, subcategory2: {}, subcategory3: {}", marketplace, category, subcategory1, subcategory2, subcategory3);
+
+        return given().basePath(BASE_PATH)
+                .when().get("/marketplaces/{marketplace}/filters?category={category}&subcategory1={subcategory1}&subcategory2={subcategory2}&subcategory3={subcategory3}", marketplace, category, subcategory1, subcategory2, subcategory3)
                 .then().statusCode(HttpStatus.OK.value())
                 .extract().as(FiltersResponse.class)
                 .filters();

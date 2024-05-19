@@ -20,6 +20,12 @@ public class CacheEnricherTest extends BaseFunctionalTest {
     }
 
     void populateCache(String marketplace, boolean assertSubcategories2) {
-        categoriesSteps.verifyAllCategories(marketplace, assertSubcategories2, args -> filtersSteps.verifyFilters(args[0], args[1], args[2], args[3]));
+        categoriesSteps.verifyAllCategories(marketplace, assertSubcategories2, args -> {
+            if (args.length == 4) {
+                filtersSteps.verifyFilters(args[0], args[1], args[2], args[3]);
+            } else if (args.length == 5) {
+                filtersSteps.verifyFilters(args[0], args[1], args[2], args[3], args[4]);
+            }
+        });
     }
 }

@@ -30,8 +30,18 @@ public class PriceAggregatorClientBulkhead implements PriceAggregatorClient {
     }
 
     @Override
+    public List<String> getSubcategories(String marketplace, String category, String subcategory1, String subcategory2) {
+        return runInSemaphore(() -> client.getSubcategories(marketplace, category, subcategory1, subcategory2));
+    }
+
+    @Override
     public List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2) {
         return runInSemaphore(() -> client.getFilters(marketplace, category, subcategory1, subcategory2));
+    }
+
+    @Override
+    public List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2, String subcategory3) {
+        return runInSemaphore(() -> client.getFilters(marketplace, category, subcategory1, subcategory2, subcategory3));
     }
 
     private <T> T runInSemaphore(Supplier<T> supplier) {

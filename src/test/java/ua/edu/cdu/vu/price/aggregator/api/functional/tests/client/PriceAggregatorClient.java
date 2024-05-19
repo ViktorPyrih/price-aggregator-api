@@ -12,5 +12,9 @@ public interface PriceAggregatorClient {
 
     List<String> getSubcategories(String marketplace, String category, String subcategory);
 
+    List<String> getSubcategories(String marketplace, String category, String subcategory1, String subcategory2);
+
     List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2);
+
+    List<FiltersResponse.Filter> getFilters(String marketplace, String category, String subcategory1, String subcategory2, String subcategory3);
 }

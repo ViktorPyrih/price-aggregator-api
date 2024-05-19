@@ -19,4 +19,12 @@ public class FiltersSteps {
                         marketplace, category, subcategory1, subcategory2)
                 .isNotEmpty();
     }
+
+    public void verifyFilters(String marketplace, String category, String subcategory1, String subcategory2, String subcategory3) {
+        var filters = priceAggregatorClient.getFilters(marketplace, category, subcategory1, subcategory2, subcategory3);
+        assertThat(filters)
+                .as("Filters list is empty for marketplace: %s, category: %s, subcategory1: %s, subcategory2: %s, subcategory3: %s",
+                        marketplace, category, subcategory1, subcategory2, subcategory3)
+                .isNotEmpty();
+    }
 }
