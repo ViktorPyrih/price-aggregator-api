@@ -29,7 +29,7 @@ resilience4j:
 price-aggregator-api:
   config:
     subcategories:
-      max-count: 2
+      max-count: 3
   selenide:
     timeout: 4000
   web-driver:

@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CategoriesSteps {
 
     private static final Set<String> SUBCATEGORIES_TO_IGNORE = Set.of("Парфумерія");
-    private static final Set<String> SUBCATEGORIES2_TO_IGNORE = Set.of("Всі бренди");
+    private static final Set<String> SUBCATEGORIES2_TO_IGNORE = Set.of("Всі бренди", "Aвтоінструмент");
 
     private final PriceAggregatorClient priceAggregatorClient;
 

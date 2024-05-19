@@ -1,0 +1,37 @@
+@startuml
+!include <C4/C4_Container>
+
+title Система агрегації цін з телеграм-ботом
+
+Person(user, "Користувач", "Взаємодіє з Telegram")
+System_Ext(telegram, "Telegram", "Месенджер")
+
+System_Boundary(price_aggregator, "Система агрегації цін") {
+    Container(telegram_bot, "Телеграм бот", "Java", "Обробка запитів\nкористувача та взаємодія з\nTelegram API")
+    Container(price_aggregator_api, "Price Aggregator API", "Java", "Збір даних про ціни з\nзовнішніх джерел")
+    Container(config_service, "Сервіс конфігурації", "Java", "Витягування конфігурації з\nвіддаленого репозиторію")
+    ContainerDb(database, "База даних", "Redis", "Зберігання та кешування\nданих")
+    Container(remote_selenium, "Remote Selenium\nWebDriver", "", "Скрепінг даних")
+    Container(local_git, "Локальний Git\nрепозиторій")
+}
+
+System_Ext(proxy_server, "Віддалений проксі\nserver")
+System_Ext(git_repo, "Git репозиторій")
+System_Ext(marketplaces, "Маркетплейси")
+System_Ext(open_ai, "OpenAI")
+
+Rel(user, telegram, "Використовує")
+Rel(telegram, telegram_bot, "Telegram API", "HTTPS")
+Rel(telegram_bot, price_aggregator_api, "Запит на одержання\nданих", "HTTPS")
+Rel(telegram_bot, database, "Читання/Запис стану\nкористувача")
+Rel(price_aggregator_api, config_service, "Одержання\nактуальної\nконфігурації", "HTTPS")
+Rel(price_aggregator_api, database, "Кешування")
+Rel(price_aggregator_api, remote_selenium, "Скрепінг даних")
+Rel(config_service, local_git, "Витяжка\nконфігурації")
+Rel(local_git, git_repo, "Клонування,\nоновлення")
+Rel(remote_selenium, proxy_server, "HTTPS/SOCKS")
+Rel(proxy_server, marketplaces, "HTTPS/SOCKS")
+Rel(price_aggregator_api, marketplaces, "HTTPS", "Отримує дані")
+Rel(price_aggregator_api, open_ai, "HTTPS", "Генерація категорій")
+
+@enduml

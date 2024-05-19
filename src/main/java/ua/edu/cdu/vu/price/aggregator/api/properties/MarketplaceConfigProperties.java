@@ -5,18 +5,22 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Value
+@Getter
+@Setter
 @Validated
 @RefreshScope
+@Configuration
 @ConfigurationProperties(prefix = "price-aggregator-api")
 public class MarketplaceConfigProperties {
 
@@ -25,7 +29,7 @@ public class MarketplaceConfigProperties {
 
     public record Part(@NotBlank String url,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig categories,
-                       @NotEmpty @Size(max = 2) List<MarketplaceConfigProperties.@Valid SelectorConfig> subcategories,
+                       @NotEmpty @Size(max = 3) List<MarketplaceConfigProperties.@Valid SelectorConfig> subcategories,
                        @NotNull @Valid MarketplaceConfigProperties.SelectorConfig filters,
                        @NotNull @Valid MarketplaceConfigProperties.ProductsSelectorConfig products,
                        @Valid MarketplaceConfigProperties.SearchSelectorConfig search) {
