@@ -92,6 +92,7 @@ public class DslEvaluationScenario implements AutoCloseable {
             String currentUrl = webDriver.url(url);
             cachedActions.add(actions.get(i));
             if (!currentUrl.equals(previousUrl)) {
+                webDriver.waitForPageLoad();
                 cacheManager.put(cachedActions, currentUrl, context);
             }
         }

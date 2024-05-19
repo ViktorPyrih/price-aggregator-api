@@ -18,6 +18,10 @@ public interface WebDriver {
 
     void open(String url);
 
+    void waitForPageLoad(String expectedUrl);
+
+    void waitForPageLoad();
+
     void close();
 
     ElementsCollection getAllElementsByCssSelector(String selector);
