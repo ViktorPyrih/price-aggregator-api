@@ -81,14 +81,13 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
     @Override
     public void run() {
         log.info("Health check of web driver pool started: {}", webDrivers.size());
-        int webDriversRemovedCount = (int) webDrivers.stream()
+        webDrivers.stream()
                 .filter(this::healthCheck)
                 .filter(webDrivers::remove)
-                .count();
-        if (webDriversRemovedCount > 0) {
-            log.info("About to reinitialize {} web drivers", webDriversRemovedCount);
-            initialize(webDriversRemovedCount);
-        }
+                .forEach(webDriver -> {
+                    log.info("Web driver removed: {}. About to reinitialize it", webDriver);
+                    initialize(1);
+                });
 
         log.info("Health check of web driver pool finished");
     }
@@ -157,7 +156,7 @@ public class FixedWebDriverPool implements WebDriverPool, Runnable {
                 return method.invoke(delegate, args);
             } catch (InvocationTargetException e) {
                 handleWebDriverException(e, method);
-                throw e;
+                throw e.getTargetException();
             }
         }
 
