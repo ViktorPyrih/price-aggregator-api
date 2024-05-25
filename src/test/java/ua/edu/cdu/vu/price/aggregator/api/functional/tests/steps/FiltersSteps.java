@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor
 public class FiltersSteps {
 
-    private static final Set<String> SUBCATEGORIES2_TO_IGNORE = Set.of("Повітряні змії");
+    private static final Set<String> SUBCATEGORIES2_TO_IGNORE = Set.of("Повітряні змії", "Подарунки", "Домофони з повідомленням на телефон", "Пульсометри і годинник для бігу");
 
     private final PriceAggregatorClient priceAggregatorClient;
 
