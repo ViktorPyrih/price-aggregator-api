@@ -32,6 +32,8 @@ price-aggregator-api:
       max-count: 3
   selenide:
     timeout: 4000
+    screenshots-enabled: false
+    page-source-enabled: false
   web-driver:
     headless: true
     pool:
