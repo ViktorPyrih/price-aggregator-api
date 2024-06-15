@@ -1,0 +1,55 @@
+@startuml
+skinparam defaultFontSize 30
+
+package "controller" {
+}
+
+package "service" {
+}
+
+package "dao" {
+}
+
+package "mapper" {
+}
+
+package "parser" {
+}
+
+package "dto" {
+}
+
+package "domain" {
+    package "command" {
+    }
+}
+
+package "exception" {
+}
+
+package "cache" {
+}
+
+package "util" {
+    package "driver" {
+    }
+}
+
+controller ..> service : access
+controller ..> dto : access
+service ..> dto : use
+service ..> exception : access
+service ..> cache : access
+service ..> domain : use
+service ..> dao : use
+service ..> mapper : use
+service ..> parser: use
+dao ..> domain : access
+mapper ..> domain : use
+parser ..> domain : access
+parser ..> command : access
+parser ..> exception : use
+domain ..> cache : access
+domain ..> util : access
+util ..> driver : use
+@enduml
