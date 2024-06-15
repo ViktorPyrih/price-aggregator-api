@@ -16,7 +16,7 @@ public class CategoriesSteps {
     private static final Set<String> SUBCATEGORIES_TO_IGNORE = Set.of("Парфумерія");
     private static final Set<String> SUBCATEGORIES2_TO_IGNORE = Set.of("Всі бренди", "Об'єктиви для проєкторів", "Іонізатори повітря", "Купелі");
 
-    private static final Set<String> SUBCATEGORIES2_WITH_3RD_LEVEL = Set.of("Автоінструмент", "Гітари й обладнання");
+    private static final Set<String> SUBCATEGORIES2_WITH_3RD_LEVEL = Set.of("Автоінструмент", "Гітари й обладнання", "Витратні матеріали");
 
     private final PriceAggregatorClient priceAggregatorClient;
 

@@ -1,10 +1,8 @@
 package ua.edu.cdu.vu.price.aggregator.api.job;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ua.edu.cdu.vu.price.aggregator.api.functional.tests.BaseFunctionalTest;
 
-@Disabled
 public class CacheEnricherTest extends BaseFunctionalTest {
 
     @Test

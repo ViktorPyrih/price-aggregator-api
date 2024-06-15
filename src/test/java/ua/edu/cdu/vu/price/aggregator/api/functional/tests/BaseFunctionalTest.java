@@ -14,7 +14,7 @@ import ua.edu.cdu.vu.price.aggregator.api.functional.tests.decorator.PriceAggreg
 import ua.edu.cdu.vu.price.aggregator.api.functional.tests.steps.CategoriesSteps;
 import ua.edu.cdu.vu.price.aggregator.api.functional.tests.steps.FiltersSteps;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"local", "test"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BaseFunctionalTest {
 
