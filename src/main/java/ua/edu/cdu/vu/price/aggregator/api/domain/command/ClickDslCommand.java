@@ -1,5 +1,6 @@
 package ua.edu.cdu.vu.price.aggregator.api.domain.command;
 
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import lombok.EqualsAndHashCode;
 import ua.edu.cdu.vu.price.aggregator.api.util.BooleanUtils;
@@ -9,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @EqualsAndHashCode(callSuper = true)
-public class ClickDslCommand extends DslCommand<SelenideElement, Void> {
+public class ClickDslCommand extends DslCommand<Object, Void> {
 
     private final boolean alignToTop;
 
@@ -20,11 +21,19 @@ public class ClickDslCommand extends DslCommand<SelenideElement, Void> {
     }
 
     @Override
-    Void executeInternal(String url, SelenideElement input, Map<String, Object> context, WebDriver webDriver) {
-        input.scrollIntoView(alignToTop);
-        if (input.isDisplayed()) {
-            input.click();
+    Void executeInternal(String url, Object input, Map<String, Object> context, WebDriver webDriver) {
+        if (input instanceof SelenideElement element) {
+            click(element);
+        } else if (input instanceof ElementsCollection collection) {
+            collection.forEach(this::click);
         }
         return null;
+    }
+
+    private void click(SelenideElement element) {
+        element.scrollIntoView(alignToTop);
+        if (element.isDisplayed()) {
+            element.click();
+        }
     }
 }
