@@ -13,6 +13,5 @@ public record SearchSelectorConfig(boolean aiEnabled,
                                    String descriptionImgSelector,
                                    String titleSelector,
                                    String priceSelector,
-                                   String pagesCountSelector,
                                    List<String> other) {
 }

@@ -63,7 +63,6 @@ public class MarketplaceConfigProperties {
                                        @NotBlank String descriptionImgSelector,
                                        @NotBlank String titleSelector,
                                        @NotBlank String priceSelector,
-                                       @NotBlank String pagesCountSelector,
                                        List<@NotBlank String> other) {
     }
 
